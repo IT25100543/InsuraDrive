@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>InsuraDrive - Payment List</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body class="bg-light">
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Payment Records</h2>
+        <a th:href="@{/payments/new}" class="btn btn-primary">+ Make New Payment</a>
+    </div>
+
+    <!-- Alert Messages -->
+    <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <span th:text="${successMessage}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <span th:text="${errorMessage}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+    <!-- Filter Options -->
+    <div class="mb-3">
+        <a th:href="@{/payments}" class="btn btn-outline-secondary btn-sm" th:classappend="${currentFilter == null ? 'active' : ''}">All Payments</a>
+        <a th:href="@{/payments(filter='pending')}" class="btn btn-outline-warning btn-sm" th:classappend="${currentFilter == 'pending' ? 'active' : ''}">Pending Only</a>
+    </div>
+
+    <!-- Payments Table -->
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <table class="table table-hover mb-0">
+                <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Policy ID</th>
+                    <th>Amount (LKR)</th>
+                    <th>Method</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="payment : ${payments}">
+                    <td th:text="${payment.id}">1</td>
+                    <td th:text="${payment.policy != null ? payment.policy.id : 'N/A'}">101</td>
+                    <td th:text="${#numbers.formatDecimal(payment.amount, 1, 'COMMA', 2, 'POINT')}">50,000.00</td>
+                    <td th:text="${payment.paymentMethod}">Card</td>
+                    <td th:text="${payment.paymentDate}">2026-10-04</td>
+                    <td>
+                        <span class="badge"
+                              th:classappend="${payment.paymentStatus == 'Paid' or payment.status == 'COMPLETED' ? 'bg-success' : (payment.paymentStatus == 'PENDING' ? 'bg-warning' : 'bg-danger')}"
+                              th:text="${payment.paymentStatus != null ? payment.paymentStatus : payment.status}">Paid</span>
+                    </td>
+                    <td>
+                        <a th:href="@{/payments/receipt/{id}(id=${payment.id})}" class="btn btn-info btn-sm text-white">Receipt</a>
+                        <a th:href="@{/payments/edit/{id}(id=${payment.id})}" class="btn btn-warning btn-sm">Edit</a>
+                        <form th:action="@{/payments/delete/{id}(id=${payment.id})}" method="post" class="d-inline">
+                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this payment?')">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(payments)}">
+                    <td colspan="7" class="text-center text-muted py-4">No payment records found.</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
