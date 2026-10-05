@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Issue Policy - InsuraDrive</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="app-container">
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+    <main class="main-content">
+        <div style="max-width: 720px; margin: 0 auto;">
+            <div class="glass-panel" style="padding: 2.2rem;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem;">
+                    <div>
+                        <h2 style="color: var(--text-primary); margin-bottom: 0.35rem;">Apply &amp; Issue Insurance Policy</h2>
+                        <p style="color: var(--text-secondary); font-size: 0.88rem;">
+                            Policy Administration &amp; Underwriting Engine
+                        </p>
+                    </div>
+                    <span class="badge badge-active">Policy Issuance</span>
+                </div>
+
+                <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}">Error message</div>
+                <div th:if="${param.error}" class="alert alert-danger" th:text="${param.error}">Error message</div>
+
+                <form th:action="@{/policies/save}" th:object="${policy}" method="post" novalidate>
+                    <div class="form-group">
+                        <label class="form-label">Policyholder (Registered Customer) *</label>
+                        <select th:field="*{customerId}" class="form-control" th:errorclass="is-invalid" required>
+                            <option value="">-- Select Registered Customer --</option>
+                            <option th:each="c : ${customers}" th:value="${c.id}" th:text="${c.fullName + ' (NIC: ' + c.nic + ')'}"></option>
+                        </select>
+                        <span class="field-error" th:if="${#fields.hasErrors('customerId')}" th:errors="*{customerId}">Customer required</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Insured Vehicle *</label>
+                        <select th:field="*{vehicleId}" class="form-control" th:errorclass="is-invalid" required>
+                            <option value="">-- Select Enrolled Vehicle --</option>
+                            <option th:each="v : ${vehicles}" th:value="${v.id}" th:text="${v.registrationNo + ' - ' + v.makeModel + ' (' + v.engineCapacityCc + ' CC, Est. LKR ' + #numbers.formatDecimal(v.estimatedValue, 1, 'COMMA', 0, 'POINT') + ')'}"></option>
+                        </select>
+                        <span class="field-error" th:if="${#fields.hasErrors('vehicleId')}" th:errors="*{vehicleId}">Vehicle required</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Insurance Package Tier *</label>
+                        <select th:field="*{policyType}" class="form-control" th:errorclass="is-invalid" required>
+                            <option value="COMPREHENSIVE_PREMIUM">Comprehensive Premium (1.5% Base + Displacement Surcharge + Age Factor)</option>
+                            <option value="COMPREHENSIVE_STANDARD">Comprehensive Standard (1.2% Base + Displacement Surcharge + Age Factor)</option>
+                            <option value="THIRD_PARTY_FIRE_THEFT">Third Party Fire &amp; Theft (0.7% Base + Displacement Surcharge)</option>
+                            <option value="THIRD_PARTY_ONLY">Third Party Only (0.35% Base Legal Coverage)</option>
+                        </select>
+                        <span class="field-error" th:if="${#fields.hasErrors('policyType')}" th:errors="*{policyType}">Package tier error</span>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem;">
+                        <div class="form-group">
+                            <label class="form-label">Policy Start Date *</label>
+                            <input type="date" th:field="*{startDate}" class="form-control" th:errorclass="is-invalid" required>
+                            <span class="field-error" th:if="${#fields.hasErrors('startDate')}" th:errors="*{startDate}">Start date required</span>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Policy Expiry Date *</label>
+                            <input type="date" th:field="*{expiryDate}" class="form-control" th:errorclass="is-invalid" required>
+                            <span class="field-error" th:if="${#fields.hasErrors('expiryDate')}" th:errors="*{expiryDate}">Expiry date required</span>
+                        </div>
+                    </div>
+
+                    <div class="info-box">
+                        <strong>Underwriting Calculation Notice:</strong> On submission, the underwriting engine dynamically calculates the required premium based on vehicle valuation, displacement class, and selected coverage tier.
+                    </div>
+
+                    <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 2rem;">
+                        <a th:href="@{/policies}" class="btn btn-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-primary">Save Policy</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+</div>
+</body>
+</html>
