@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Enroll Vehicle - Customer Portal</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="app-container">
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+    <main class="main-content">
+        <div style="margin-bottom: 2rem;">
+            <h2>Enroll New Vehicle</h2>
+            <p style="color: var(--text-muted); font-size: 0.875rem; margin-top: 0.25rem;">
+                Add your vehicle to InsuraDrive to apply for comprehensive or third-party insurance coverage.
+            </p>
+        </div>
+
+        <div class="glass-panel" style="max-width: 650px; padding: 2rem;">
+            <form th:action="@{/customer/vehicles/save}" th:object="${vehicle}" method="post">
+                <div class="form-group">
+                    <label class="form-label" for="registrationNo">Registration Number (Vehicle Plate) <span style="color:#dc2626;">*</span></label>
+                    <input id="registrationNo" type="text" th:field="*{registrationNo}" class="form-control" placeholder="e.g. WP CAB-9812 or WP KQ-1234" required autofocus>
+                    <small style="color: var(--text-3); font-size: 0.78rem;">Enter official provincial registration plate format.</small>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="model">Make &amp; Model <span style="color:#dc2626;">*</span></label>
+                    <input id="model" type="text" th:field="*{model}" class="form-control" placeholder="e.g. Toyota Corolla Hybrid or Honda Civic" required>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                        <label class="form-label" for="manufacturerYear">Year of Manufacture <span style="color:#dc2626;">*</span></label>
+                        <input id="manufacturerYear" type="number" min="1990" max="2026" th:field="*{manufacturerYear}" class="form-control" placeholder="e.g. 2021" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="engineCapacity">Engine Capacity (CC) <span style="color:#dc2626;">*</span></label>
+                        <input id="engineCapacity" type="number" min="50" max="10000" th:field="*{engineCapacity}" class="form-control" placeholder="e.g. 1500" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="chassisNo">Chassis / VIN Number <span style="color:#dc2626;">*</span></label>
+                    <input id="chassisNo" type="text" th:field="*{chassisNo}" class="form-control" placeholder="e.g. NHP10-9821873" required>
+                </div>
+
+                <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                    <button type="submit" class="btn btn-primary" style="flex: 1;">Save &amp; Enroll Vehicle</button>
+                    <a th:href="@{/customer/vehicles}" class="btn btn-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </main>
+</div>
+</body>
+</html>
