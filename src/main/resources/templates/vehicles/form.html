@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Enroll Vehicle - InsuraDrive</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="app-container">
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+    <main class="main-content">
+        <div style="max-width: 720px; margin: 0 auto;">
+            <div class="glass-panel" style="padding: 2.2rem;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem;">
+                    <div>
+                        <h2 style="color: var(--text-primary); margin-bottom: 0.35rem;">Enroll New Vehicle</h2>
+                        <p style="color: var(--text-secondary); font-size: 0.88rem;">
+                            Vehicle Registration &amp; Roadworthiness Inspection
+                        </p>
+                    </div>
+                    <span class="badge badge-active">Enrollment</span>
+                </div>
+
+                <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}">Error message</div>
+                <div th:if="${param.error}" class="alert alert-danger" th:text="${param.error}">Error message</div>
+
+                <form th:action="@{/vehicles/save}" th:object="${vehicle}" method="post" novalidate>
+                    <div class="form-group">
+                        <label class="form-label">Vehicle Owner (Registered Customer) *</label>
+                        <select th:field="*{customerId}" class="form-control" th:errorclass="is-invalid" required>
+                            <option value="">-- Select Customer --</option>
+                            <option th:each="c : ${customers}" th:value="${c.id}" th:text="${c.fullName + ' (NIC: ' + c.nic + ')'}"></option>
+                        </select>
+                        <span class="field-error" th:if="${#fields.hasErrors('customerId')}" th:errors="*{customerId}">Owner selection error</span>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem;">
+                        <div class="form-group">
+                            <label class="form-label">Registration Number *</label>
+                            <input type="text" th:field="*{registrationNo}" class="form-control" th:errorclass="is-invalid"
+                                   placeholder="e.g. WP CAB-9948" required>
+                            <span class="field-error" th:if="${#fields.hasErrors('registrationNo')}" th:errors="*{registrationNo}">Registration error</span>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Make &amp; Model *</label>
+                            <input type="text" th:field="*{model}" class="form-control" th:errorclass="is-invalid"
+                                   placeholder="e.g. Toyota Corolla Hybrid" required>
+                            <span class="field-error" th:if="${#fields.hasErrors('model')}" th:errors="*{model}">Model error</span>
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem;">
+                        <div class="form-group">
+                            <label class="form-label">Manufacture Year *</label>
+                            <input type="number" th:field="*{manufacturerYear}" class="form-control" th:errorclass="is-invalid"
+                                   placeholder="2022" min="1970" max="2027" required>
+                            <span class="field-error" th:if="${#fields.hasErrors('manufacturerYear')}" th:errors="*{manufacturerYear}">Year error</span>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Engine Capacity (CC) *</label>
+                            <input type="number" th:field="*{engineCapacity}" class="form-control" th:errorclass="is-invalid"
+                                   placeholder="1500" min="50" max="10000" required>
+                            <span class="field-error" th:if="${#fields.hasErrors('engineCapacity')}" th:errors="*{engineCapacity}">Engine CC error</span>
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem;">
+                        <div class="form-group">
+                            <label class="form-label">Chassis / VIN Number *</label>
+                            <input type="text" th:field="*{chassisNo}" class="form-control" th:errorclass="is-invalid"
+                                   placeholder="e.g. RU1-1029384" required>
+                            <span class="field-error" th:if="${#fields.hasErrors('chassisNo')}" th:errors="*{chassisNo}">Chassis error</span>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Vehicle Category</label>
+                            <select th:field="*{vehicleCategory}" class="form-control">
+                                <option value="Sedan / Hybrid">Sedan / Hybrid</option>
+                                <option value="SUV / Crossover">SUV / Crossover</option>
+                                <option value="Hatchback / Compact">Hatchback / Compact</option>
+                                <option value="Motorcycle / Scooter">Motorcycle / Scooter</option>
+                                <option value="Commercial Truck / Van">Commercial Truck / Van</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Estimated Market Value (LKR) *</label>
+                        <input type="number" step="10000" th:field="*{estimatedValue}" class="form-control" th:errorclass="is-invalid"
+                               placeholder="8500000" required>
+                        <span class="field-error" th:if="${#fields.hasErrors('estimatedValue')}" th:errors="*{estimatedValue}">Estimated value error</span>
+                    </div>
+
+                    <div class="info-box">
+                        <strong>Inspection Automation Notice:</strong> Vehicles older than 10 years automatically transition to <code>PENDING_INSPECTION</code> status, requiring workshop inspection before policy quotation.
+                    </div>
+
+                    <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 2rem;">
+                        <a th:href="@{/vehicles}" class="btn btn-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-primary">Enroll Vehicle</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+</div>
+</body>
+</html>
