@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Claim &amp; Identity Documents - Customer Portal</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="app-container">
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+    <main class="main-content">
+        <div style="margin-bottom: 2rem;">
+            <h2>Claim &amp; Identity Documents</h2>
+            <p style="color: var(--text-muted); font-size: 0.875rem; margin-top: 0.25rem;">
+                Upload and track verification of required identity, vehicle registration, and claim evidence documents.
+            </p>
+        </div>
+
+        <div th:if="${successMessage}" class="alert alert-success">
+            <span th:text="${successMessage}">Document recorded successfully.</span>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1.4fr 1fr; gap: 2rem;">
+            <!-- Documents List Table -->
+            <div class="glass-panel" style="padding: 1.5rem;">
+                <h3 style="margin-bottom: 1rem; color: var(--text-primary);">Recorded Verification Documents</h3>
+                <div class="table-responsive">
+                    <table class="custom-table">
+                        <thead>
+                        <tr>
+                            <th>Document Type</th>
+                            <th>Document No.</th>
+                            <th>Recorded Date</th>
+                            <th>Status</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:if="${#lists.isEmpty(documents)}">
+                            <td colspan="4" style="text-align: center; color: var(--text-muted); padding: 2rem;">
+                                No verification documents recorded yet.
+                            </td>
+                        </tr>
+                        <tr th:each="doc : ${documents}">
+                            <td th:text="${doc.documentType}" style="font-weight: 700; color: var(--brand);">NIC</td>
+                            <td th:text="${doc.documentNumber}" style="font-family: monospace;">DOC-001</td>
+                            <td th:text="${#temporals.format(doc.uploadDate, 'yyyy-MM-dd HH:mm')}">2026-01-01</td>
+                            <td>
+                                <span class="badge" th:classappend="${#strings.containsIgnoreCase(doc.verificationStatus, 'verified') ? 'badge-verified' : 'badge-pending'}" th:text="${doc.verificationStatus}">Pending</span>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Upload New Document Form -->
+            <div class="glass-panel" style="padding: 1.5rem;">
+                <h3 style="margin-bottom: 1.25rem; font-size: 1.05rem; border-bottom: 1px solid var(--line); padding-bottom: 0.5rem;">Record New Document</h3>
+                <form th:action="@{/customer/documents/upload}" method="post">
+                    <div class="form-group">
+                        <label class="form-label" for="documentType">Document Type <span style="color:#dc2626;">*</span></label>
+                        <select id="documentType" name="documentType" class="form-control" required>
+                            <option value="National Identity Card (NIC)">National Identity Card (NIC)</option>
+                            <option value="Driving Licence">Driving Licence</option>
+                            <option value="Vehicle Registration Certificate (CR Book)">Vehicle Registration Certificate (CR Book)</option>
+                            <option value="Revenue Licence">Revenue Licence</option>
+                            <option value="Police Accident Report">Police Accident Report</option>
+                            <option value="Garage Repair Estimate / Quotation">Garage Repair Estimate / Quotation</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="documentNumber">Document Reference / ID Number <span style="color:#dc2626;">*</span></label>
+                        <input id="documentNumber" type="text" name="documentNumber" class="form-control" placeholder="e.g. NIC-951234567 or CR-772910" required>
+                    </div>
+
+                    <div class="info-box" style="margin-top: 1rem; margin-bottom: 1.25rem; font-size: 0.8rem;">
+                        Document references are verified against Department of Motor Traffic (DMT) and national registration databases.
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Record Document</button>
+                </form>
+            </div>
+        </div>
+    </main>
+</div>
+</body>
+</html>
