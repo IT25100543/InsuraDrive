@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Risk & Compliance - InsuraDrive</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+
+<body>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="app-container">
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+    <main class="main-content">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <div>
+                <h2>Risk & Compliance Officer Audit Portal</h2>
+                <p style="color: var(--text-muted); font-size: 0.9rem;">Real-time governance trail, security
+                    activity records, and audit compliance logging.</p>
+            </div>
+        </div>
+
+        <div class="glass-panel" style="padding: 1.5rem;">
+            <h3 style="margin-bottom: 1rem; color: var(--text-primary);">
+                System Activity &amp; Audit Trail Logs
+            </h3>
+            <div class="table-responsive">
+                <table class="custom-table">
+                    <thead>
+                    <tr>
+                        <th>Timestamp</th>
+                        <th>User</th>
+                        <th>Role</th>
+                        <th>Action</th>
+                        <th>Target Module</th>
+                        <th>Activity Details</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="log : ${auditLogs}">
+                        <td th:text="${#temporals.format(log.timestamp, 'yyyy-MM-dd HH:mm:ss')}"
+                            style="color: var(--text-muted); font-size: 0.85rem;">Time</td>
+                        <td th:text="${log.username}" style="font-weight: 600;">User</td>
+                        <td>
+                            <span class="badge badge-active" th:text="${log.userRole}">ROLE</span>
+                        </td>
+                        <td th:text="${log.action}" style="color: var(--primary); font-weight: 600;">ACTION</td>
+                        <td th:text="${log.targetModule}">Module</td>
+                        <td th:text="${log.details}" style="color: var(--text-secondary);">Details</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</div>
+</body>
+
+</html>
