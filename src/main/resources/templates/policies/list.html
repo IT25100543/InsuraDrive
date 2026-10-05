@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Policy Administration - InsuraDrive</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="app-container">
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+    <main class="main-content">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+            <div>
+                <h2>Policy Administration</h2>
+                <p style="color: var(--text-secondary); font-size: 0.9rem;">
+                    Manage active insurance policies, coverage tiers, premium rates, renewals, and cancellations.
+                </p>
+            </div>
+            <div>
+                <a th:href="@{/policies/new}" class="btn btn-primary">Issue New Policy</a>
+            </div>
+        </div>
+
+        <!-- Flash alerts -->
+        <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}">Policy operation succeeded.</div>
+        <div th:if="${param.success}" class="alert alert-success" th:text="${param.success}">Policy operation succeeded.</div>
+        <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}">An error occurred.</div>
+        <div th:if="${param.error}" class="alert alert-danger" th:text="${param.error}">An error occurred.</div>
+
+        <!-- Strategy Pattern Badge Notice -->
+        <div class="glass-panel" style="padding: 0.75rem 1.25rem; margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: space-between;">
+            <div>
+                <span class="badge badge-active" style="margin-right: 0.5rem;">OOP Design Pattern</span>
+                <span style="font-size: 0.85rem; color: var(--text-secondary);">Premium calculation runs on <strong>Strategy Design Pattern</strong> (<code>PremiumCalculationStrategy</code>).</span>
+            </div>
+            <div>
+                <a th:href="@{/policies/new}" class="btn btn-secondary" style="font-size: 0.8rem; padding: 0.25rem 0.6rem;">Test Live Strategy Calculator</a>
+            </div>
+        </div>
+
+        <div class="glass-panel" style="padding: 1.5rem;">
+            <div class="table-responsive">
+                <table class="custom-table">
+                    <thead>
+                    <tr>
+                        <th>Policy Number</th>
+                        <th>Policyholder</th>
+                        <th>Vehicle & CC</th>
+                        <th>Coverage Strategy Tier</th>
+                        <th>Annual Premium</th>
+                        <th>Validity Period</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="p : ${policies}">
+                        <td>
+                            <strong style="color: var(--primary-accent); font-size: 1.05rem;" th:text="${p.policyNumber}">POL-000</strong><br>
+                            <small th:if="${p.renewalCount != null && p.renewalCount > 0}" style="color: var(--accent); font-size: 0.75rem;" th:text="${'Renewed: ' + p.renewalCount + ' times'}">Renewed</small>
+                        </td>
+                        <td>
+                            <strong th:text="${p.customer != null ? p.customer.fullName : 'N/A'}">Customer</strong><br>
+                            <small th:text="${p.customer != null ? p.customer.nicPassport : ''}" style="color: var(--text-muted);">NIC</small>
+                        </td>
+                        <td>
+                            <strong th:text="${p.vehicle != null ? p.vehicle.registrationNo : 'N/A'}">Reg</strong><br>
+                            <small th:text="${p.vehicle != null ? p.vehicle.makeModel : ''}" style="color: var(--text-muted);">Model</small>
+                        </td>
+                        <td>
+                            <span class="badge badge-secondary" th:text="${p.policyType}">COMPREHENSIVE</span><br>
+                            <small style="color: var(--text-muted);" th:text="${'Sum: LKR ' + #numbers.formatDecimal(p.sumInsured, 1, 'COMMA', 0, 'POINT')}">Sum</small>
+                        </td>
+                        <td>
+                            <strong style="color: var(--accent); font-size: 1.05rem;" th:text="${'LKR ' + #numbers.formatDecimal(p.annualPremium, 1, 'COMMA', 2, 'POINT')}">LKR 0.00</strong>
+                        </td>
+                        <td>
+                            <small th:text="${p.startDate + ' to ' + p.endDate}">Dates</small>
+                        </td>
+                        <td>
+                            <span class="badge" th:classappend="${'badge-' + #strings.toLowerCase(p.status)}" th:text="${p.status}">ACTIVE</span>
+                            <small th:if="${p.cancellationReason != null}" style="color: var(--danger); display: block; font-size: 0.7rem;" th:text="${p.cancellationReason}">Reason</small>
+                        </td>
+                        <td>
+                            <div style="display: flex; gap: 0.4rem; align-items: center;">
+                                <!-- Renew Button -->
+                                <form th:if="${p.status != null && p.status.name() != 'CANCELLED'}" th:action="@{/policies/renew/{id}(id=${p.id})}" method="post">
+                                    <button type="submit" class="btn btn-secondary" style="font-size: 0.75rem; padding: 0.25rem 0.5rem;" title="Extend validity by 1 year">Renew</button>
+                                </form>
+
+                                <!-- Cancel Button -->
+                                <form th:if="${p.status != null && p.status.name() != 'CANCELLED'}" th:action="@{/policies/cancel/{id}(id=${p.id})}" method="post" onsubmit="return confirm('Confirm policy cancellation?');">
+                                    <input type="hidden" name="reason" value="Customer cancellation request">
+                                    <button type="submit" class="btn btn-danger" style="font-size: 0.75rem; padding: 0.25rem 0.5rem;">Cancel</button>
+                                </form>
+
+                                <a th:href="@{/payments/new(policyId=${p.id})}" class="btn btn-primary" style="font-size: 0.75rem; padding: 0.25rem 0.5rem;">Pay</a>
+
+                                <form th:action="@{/policies/delete/{id}(id=${p.id})}" method="post" onsubmit="return confirm('Delete or deactivate this policy record?');">
+                                    <button type="submit" class="btn btn-danger" style="font-size: 0.75rem; padding: 0.25rem 0.5rem;">Delete</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</div>
+</body>
+</html>
