@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Edit Claim Details - InsuraDrive</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="app-container">
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+    <main class="main-content">
+        <div style="max-width: 720px; margin: 0 auto;">
+            <div class="glass-panel" style="padding: 2.2rem;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem;">
+                    <div>
+                        <h2 style="color: var(--text-primary); margin-bottom: 0.35rem;">Edit Insurance Claim</h2>
+                        <p style="color: var(--text-secondary); font-size: 0.88rem;">
+                            Update incident information and claimed damage estimates
+                        </p>
+                    </div>
+                    <span class="badge badge-active" th:text="${claim.claimNumber}">CLM-0000</span>
+                </div>
+
+                <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}">Error message</div>
+
+                <form th:action="@{/claims/update/{id}(id=${claim.id})}" th:object="${claimFormDto}" method="post" novalidate>
+                    <input type="hidden" th:field="*{id}">
+                    <input type="hidden" th:field="*{policyId}">
+
+                    <div class="form-group">
+                        <label class="form-label">Associated Policy Number</label>
+                        <input type="text" th:value="${claim.policy != null ? claim.policy.policyNumber : 'N/A'}" class="form-control" disabled style="opacity: 0.7;">
+                        <small style="color: var(--text-muted); font-size: 0.75rem;">Policy reference is permanent.</small>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem;">
+                        <div class="form-group">
+                            <label class="form-label">Incident Date *</label>
+                            <input type="date" th:field="*{incidentDate}" class="form-control" th:errorclass="is-invalid" required>
+                            <span class="field-error" th:if="${#fields.hasErrors('incidentDate')}" th:errors="*{incidentDate}">Incident date error</span>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Claimed Estimate Amount (LKR) *</label>
+                            <input type="number" step="1000" th:field="*{claimedAmount}" class="form-control" th:errorclass="is-invalid" required>
+                            <span class="field-error" th:if="${#fields.hasErrors('claimedAmount')}" th:errors="*{claimedAmount}">Claim amount error</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Incident Location *</label>
+                        <input type="text" th:field="*{incidentLocation}" class="form-control" th:errorclass="is-invalid" required>
+                        <span class="field-error" th:if="${#fields.hasErrors('incidentLocation')}" th:errors="*{incidentLocation}">Location required</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Incident Description &amp; Damage Details *</label>
+                        <textarea th:field="*{description}" class="form-control" th:errorclass="is-invalid" rows="4" required></textarea>
+                        <span class="field-error" th:if="${#fields.hasErrors('description')}" th:errors="*{description}">Description error</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Supporting Evidence / Police Report Document</label>
+                        <input type="text" th:field="*{documentAttachment}" class="form-control">
+                    </div>
+
+                    <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 2rem;">
+                        <a th:href="@{/claims}" class="btn btn-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+</div>
+</body>
+</html>
