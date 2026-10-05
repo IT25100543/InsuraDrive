@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Policy Details - Customer Portal</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="app-container">
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+    <main class="main-content">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <div>
+                <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.25rem;">
+                    <h2 th:text="${policy.policyNumber}">POL-2026-001</h2>
+                    <span class="badge" th:classappend="${'badge-' + #strings.toLowerCase(policy.status)}" th:text="${policy.status}">ACTIVE</span>
+                </div>
+                <p style="color: var(--text-muted); font-size: 0.875rem;">
+                    Insurance policy schedule and coverage details.
+                </p>
+            </div>
+            <div style="display: flex; gap: 0.75rem;">
+                <a th:if="${policy.status == T(com.insuradrive.model.InsurancePolicy.PolicyStatus).ACTIVE}"
+                   th:href="@{/customer/claims/new}" class="btn btn-primary">File a Claim</a>
+                <a th:if="${policy.status == T(com.insuradrive.model.InsurancePolicy.PolicyStatus).PENDING_PAYMENT}"
+                   th:href="@{'/customer/payments/pay?policyId=' + ${policy.id}}" class="btn btn-primary">Pay Premium</a>
+                <a th:href="@{/customer/policies}" class="btn btn-secondary">Back to Policies</a>
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 1.5rem; margin-bottom: 2rem;">
+            <!-- Policy Terms Panel -->
+            <div class="glass-panel" style="padding: 1.75rem;">
+                <h3 style="margin-bottom: 1.25rem; font-size: 1.05rem; border-bottom: 1px solid var(--line); padding-bottom: 0.5rem;">Policy Coverage &amp; Terms</h3>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem;">
+                    <div>
+                        <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-3); text-transform: uppercase;">Coverage Plan</div>
+                        <div style="font-weight: 700; color: var(--brand); margin-top: 0.2rem;" th:text="${policy.policyType}">Comprehensive Premium</div>
+                    </div>
+                    <div>
+                        <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-3); text-transform: uppercase;">Sum Insured</div>
+                        <div style="font-weight: 700; color: var(--text); margin-top: 0.2rem;" th:text="${policy.sumInsured != null ? 'LKR ' + #numbers.formatDecimal(policy.sumInsured, 1, 'COMMA', 2, 'POINT') : '-'}">LKR 0.00</div>
+                    </div>
+                    <div>
+                        <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-3); text-transform: uppercase;">Annual Premium</div>
+                        <div style="font-weight: 700; color: var(--ok); margin-top: 0.2rem;" th:text="${policy.annualPremium != null ? 'LKR ' + #numbers.formatDecimal(policy.annualPremium, 1, 'COMMA', 2, 'POINT') : '-'}">LKR 0.00</div>
+                    </div>
+                    <div>
+                        <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-3); text-transform: uppercase;">Renewals</div>
+                        <div style="color: var(--text-2); margin-top: 0.2rem;" th:text="${policy.renewalCount != null ? policy.renewalCount : 0}">0</div>
+                    </div>
+                    <div>
+                        <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-3); text-transform: uppercase;">Effective From</div>
+                        <div style="color: var(--text-2); margin-top: 0.2rem;" th:text="${policy.startDate != null ? policy.startDate : 'N/A'}">2026-01-01</div>
+                    </div>
+                    <div>
+                        <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-3); text-transform: uppercase;">Expires On</div>
+                        <div style="color: var(--text-2); margin-top: 0.2rem;" th:text="${policy.endDate != null ? policy.endDate : 'N/A'}">2027-01-01</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Insured Vehicle Panel -->
+            <div class="glass-panel" style="padding: 1.75rem;">
+                <h3 style="margin-bottom: 1.25rem; font-size: 1.05rem; border-bottom: 1px solid var(--line); padding-bottom: 0.5rem;">Insured Vehicle</h3>
+                <div th:if="${policy.vehicle != null}" style="display: grid; gap: 1rem;">
+                    <div>
+                        <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-3); text-transform: uppercase;">Registration Plate</div>
+                        <div style="font-size: 1.15rem; font-weight: 800; color: var(--brand); margin-top: 0.2rem;" th:text="${policy.vehicle.registrationNo}">WP CAB-1234</div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div>
+                            <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-3); text-transform: uppercase;">Make &amp; Model</div>
+                            <div style="color: var(--text); font-weight: 600; margin-top: 0.2rem;" th:text="${policy.vehicle.makeModel}">Toyota Prius</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-3); text-transform: uppercase;">Year / Engine</div>
+                            <div style="color: var(--text-2); margin-top: 0.2rem;" th:text="${policy.vehicle.manufacturerYear + ' &bull; ' + policy.vehicle.engineCapacity + 'cc'}">2021 &bull; 1500cc</div>
+                        </div>
+                    </div>
+                    <div>
+                        <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-3); text-transform: uppercase;">Chassis / VIN</div>
+                        <div style="font-family: monospace; font-size: 0.85rem; color: var(--text-2); margin-top: 0.2rem;" th:text="${policy.vehicle.chassisNo}">CHAS-123456</div>
+                    </div>
+                </div>
+                <div th:if="${policy.vehicle == null}" style="color: var(--text-muted);">
+                    No vehicle record attached to this policy.
+                </div>
+            </div>
+        </div>
+
+        <!-- Linked Payments -->
+        <div class="glass-panel" style="padding: 1.5rem; margin-bottom: 2rem;">
+            <h3 style="margin-bottom: 1rem; color: var(--text-primary);">Settled Premium Payments</h3>
+            <div class="table-responsive">
+                <table class="custom-table">
+                    <thead>
+                    <tr>
+                        <th>Transaction ID</th>
+                        <th>Receipt No.</th>
+                        <th>Amount</th>
+                        <th>Payment Date</th>
+                        <th>Method</th>
+                        <th>Status</th>
+                        <th>Receipt</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:if="${#lists.isEmpty(payments)}">
+                        <td colspan="7" style="text-align: center; color: var(--text-muted); padding: 1.5rem;">No payment transactions recorded for this policy.</td>
+                    </tr>
+                    <tr th:each="pmt : ${payments}">
+                        <td th:text="${pmt.transactionId}" style="font-weight: 700; font-family: monospace;">TXN-000</td>
+                        <td th:text="${pmt.receiptNumber != null ? pmt.receiptNumber : '-'}" style="font-weight: 600; color: var(--brand);">RCP-000</td>
+                        <td th:text="${'LKR ' + #numbers.formatDecimal(pmt.amount, 1, 'COMMA', 2, 'POINT')}">0.00</td>
+                        <td th:text="${#temporals.format(pmt.paymentDate, 'yyyy-MM-dd HH:mm')}">2026-01-01</td>
+                        <td th:text="${pmt.paymentMethod}">Credit Card</td>
+                        <td>
+                            <span class="badge" th:classappend="${'badge-' + #strings.toLowerCase(pmt.status)}" th:text="${pmt.status}">COMPLETED</span>
+                        </td>
+                        <td>
+                            <a th:href="@{'/customer/receipts/' + ${pmt.id}}" class="btn btn-secondary" style="padding: 0.3rem 0.6rem; font-size: 0.75rem;">View Receipt</a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Linked Claims -->
+        <div class="glass-panel" style="padding: 1.5rem;">
+            <h3 style="margin-bottom: 1rem; color: var(--text-primary);">Claims History</h3>
+            <div class="table-responsive">
+                <table class="custom-table">
+                    <thead>
+                    <tr>
+                        <th>Claim No.</th>
+                        <th>Incident Date</th>
+                        <th>Description</th>
+                        <th>Claimed Amount</th>
+                        <th>Status</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:if="${#lists.isEmpty(claims)}">
+                        <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 1.5rem;">No claims reported under this policy.</td>
+                    </tr>
+                    <tr th:each="c : ${claims}">
+                        <td th:text="${c.claimNumber}" style="font-weight: 700; color: var(--brand);">CLM-000</td>
+                        <td th:text="${c.incidentDate}">2026-01-01</td>
+                        <td th:text="${c.description}">Description</td>
+                        <td th:text="${'LKR ' + #numbers.formatDecimal(c.claimedAmount, 1, 'COMMA', 2, 'POINT')}">0.00</td>
+                        <td>
+                            <span class="badge" th:classappend="${'badge-' + #strings.toLowerCase(c.status)}" th:text="${c.status}">SUBMITTED</span>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</div>
+</body>
+</html>
