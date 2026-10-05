@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Insurance Packages - Customer Portal</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="app-container">
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+    <main class="main-content">
+        <div style="margin-bottom: 2rem;">
+            <h2>Insurance Packages &amp; Plans</h2>
+            <p style="color: var(--text-muted); font-size: 0.875rem; margin-top: 0.25rem;">
+                Select an insurance coverage package that suits your vehicle protection requirements.
+            </p>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
+            <div th:each="pkg : ${packages}" class="glass-card" style="display: flex; flex-direction: column; justify-content: space-between; border-top: 4px solid var(--brand);">
+                <div>
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem;">
+                        <h3 th:text="${pkg.packageName}" style="font-size: 1.15rem; color: var(--text);">Plan Title</h3>
+                        <span class="badge" th:classappend="${#strings.containsIgnoreCase(pkg.coverageType, 'comprehensive') ? 'badge-active' : 'badge-pending'}" th:text="${pkg.coverageType}">Type</span>
+                    </div>
+                    <p th:text="${pkg.description != null ? pkg.description : 'Comprehensive motor protection for passenger cars and light commercial vehicles.'}" style="color: var(--text-2); font-size: 0.875rem; line-height: 1.5; margin-bottom: 1.5rem;">Description</p>
+                </div>
+
+                <div style="padding-top: 1rem; border-top: 1px solid var(--line);">
+                    <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-3); text-transform: uppercase;">Base Annual Premium</div>
+                    <div style="font-size: 1.4rem; font-weight: 800; color: var(--brand); margin: 0.2rem 0 1rem;">
+                        <span th:text="${'LKR ' + #numbers.formatDecimal(pkg.basePremium, 1, 'COMMA', 2, 'POINT')}">LKR 0.00</span>
+                    </div>
+                    <a th:href="@{'/customer/apply?packageId=' + ${pkg.packageID}}" class="btn btn-primary" style="width: 100%;">
+                        Apply with This Plan
+                    </a>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+</body>
+</html>
