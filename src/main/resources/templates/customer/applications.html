@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>My Applications - Customer Portal</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="app-container">
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+    <main class="main-content">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <div>
+                <h2>My Policy Applications</h2>
+                <p style="color: var(--text-muted); font-size: 0.875rem; margin-top: 0.25rem;">
+                    Track review status and underwriter decisions on your policy enrollment requests.
+                </p>
+            </div>
+            <div>
+                <a th:href="@{/customer/apply}" class="btn btn-primary">New Application</a>
+            </div>
+        </div>
+
+        <div th:if="${successMessage}" class="alert alert-success">
+            <span th:text="${successMessage}">Application submitted successfully.</span>
+        </div>
+
+        <div class="glass-panel" style="padding: 1.5rem;">
+            <div class="table-responsive">
+                <table class="custom-table">
+                    <thead>
+                    <tr>
+                        <th>App ID</th>
+                        <th>Vehicle Reg</th>
+                        <th>Package Plan</th>
+                        <th>Calculated Premium</th>
+                        <th>Date Applied</th>
+                        <th>Status</th>
+                        <th>Decision Comments</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:if="${#lists.isEmpty(applications)}">
+                        <td colspan="7" style="text-align: center; color: var(--text-muted); padding: 2.5rem;">
+                            No policy applications submitted yet.
+                            <div style="margin-top: 0.75rem;">
+                                <a th:href="@{/customer/apply}" class="btn btn-primary" style="font-size: 0.82rem;">Submit an Application</a>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr th:each="app : ${applications}">
+                        <td style="font-weight: 700; color: var(--brand);" th:text="${'#APP-' + app.applicationID}">#APP-1</td>
+                        <td style="font-weight: 600;" th:text="${app.vehicle != null ? app.vehicle.registrationNo : 'N/A'}">WP CAB-1234</td>
+                        <td th:text="${app.insurancePackage != null ? app.insurancePackage.packageName : 'Standard'}">Standard Comprehensive</td>
+                        <td th:text="${'LKR ' + #numbers.formatDecimal(app.calculatedPremium, 1, 'COMMA', 2, 'POINT')}">LKR 0.00</td>
+                        <td th:text="${app.applicationDate}">2026-01-01</td>
+                        <td>
+                            <span class="badge" th:classappend="${#strings.containsIgnoreCase(app.status, 'approved') ? 'badge-approved' : (#strings.containsIgnoreCase(app.status, 'rejected') ? 'badge-rejected' : 'badge-pending')}" th:text="${app.status}">Pending Review</span>
+                        </td>
+                        <td th:text="${app.decisionComments != null ? app.decisionComments : (app.status == 'Approved' ? 'Application accepted by underwriting' : 'Under assessment')}" style="color: var(--text-2); font-size: 0.82rem;">Comments</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</div>
+</body>
+</html>
