@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Claims Directory - InsuraDrive</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="app-container">
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+    <main class="main-content">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+            <div>
+                <h2>Claims Management Registry</h2>
+                <p style="color: var(--text-muted); font-size: 0.875rem; margin-top: 0.25rem;">
+                    Claim submission, document verification, assessor remarks & status tracking
+                </p>
+            </div>
+            <div>
+                <a th:href="@{/claims/new}" class="btn btn-primary">Submit New Claim</a>
+            </div>
+        </div>
+
+        <!-- Flash alerts -->
+        <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}">Action completed.</div>
+        <div th:if="${param.success}" class="alert alert-success" th:text="${param.success}">Action completed.</div>
+        <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}">An error occurred.</div>
+        <div th:if="${param.error}" class="alert alert-danger" th:text="${param.error}">An error occurred.</div>
+
+        <!-- Filter tabs -->
+        <div style="display: flex; gap: 0.5rem; margin-bottom: 1.5rem;">
+            <a th:href="@{/claims}" class="btn" th:classappend="${selectedStatus == null ? 'btn-primary' : 'btn-secondary'}">All Claims</a>
+            <a th:href="@{/claims(status='SUBMITTED')}" class="btn" th:classappend="${selectedStatus == 'SUBMITTED' ? 'btn-primary' : 'btn-secondary'}">Submitted</a>
+            <a th:href="@{/claims(status='UNDER_VERIFICATION')}" class="btn" th:classappend="${selectedStatus == 'UNDER_VERIFICATION' ? 'btn-primary' : 'btn-secondary'}">Under Verification</a>
+            <a th:href="@{/claims(status='DOCUMENTS_REQUIRED')}" class="btn" th:classappend="${selectedStatus == 'DOCUMENTS_REQUIRED' ? 'btn-primary' : 'btn-secondary'}">Docs Requested</a>
+            <a th:href="@{/claims(status='APPROVED')}" class="btn" th:classappend="${selectedStatus == 'APPROVED' ? 'btn-primary' : 'btn-secondary'}">Approved</a>
+        </div>
+
+        <div class="glass-panel" style="padding: 1.5rem;">
+            <div class="table-responsive">
+                <table class="custom-table">
+                    <thead>
+                    <tr>
+                        <th>Claim No</th>
+                        <th>Policy & Vehicle</th>
+                        <th>Incident Info</th>
+                        <th>Claimed vs Approved</th>
+                        <th>Status</th>
+                        <th>Assessor Action & Review</th>
+                        <th>Timeline</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="c : ${claims}">
+                        <td>
+                            <strong style="color: var(--primary-accent); font-size: 1.05rem;" th:text="${c.claimNumber}">CLM-000</strong><br>
+                            <small style="color: var(--text-muted);" th:text="${'Doc: ' + c.documentName}">doc.pdf</small>
+                        </td>
+                        <td>
+                            <strong th:text="${c.policy != null ? c.policy.policyNumber : 'N/A'}">POL-000</strong><br>
+                            <small th:text="${c.policy != null && c.policy.vehicle != null ? c.policy.vehicle.registrationNo : ''}" style="color: var(--text-muted);">Vehicle</small>
+                        </td>
+                        <td>
+                            <strong th:text="${c.incidentDate}">2026-01-01</strong><br>
+                            <small th:text="${c.incidentLocation}" style="color: var(--text-muted);">Location</small><br>
+                            <small th:text="${c.description}" style="color: var(--text-secondary); display: block; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Desc</small>
+                        </td>
+                        <td>
+                            <span>Claimed: <strong th:text="${'LKR ' + #numbers.formatDecimal(c.claimedAmount, 1, 'COMMA', 2, 'POINT')}">LKR 0</strong></span><br>
+                            <small th:if="${c.approvedAmount != null}" style="color: var(--accent); font-weight: 600;" th:text="${'Approved: LKR ' + #numbers.formatDecimal(c.approvedAmount, 1, 'COMMA', 2, 'POINT')}">App</small>
+                        </td>
+                        <td>
+                            <span class="badge" th:classappend="${'badge-' + #strings.toLowerCase(c.status)}" th:text="${c.status}">SUBMITTED</span>
+                            <small th:if="${c.officerRemarks != null}" style="color: var(--text-muted); display: block; font-size: 0.75rem; margin-top: 0.25rem;" th:text="${c.officerRemarks}">Remarks</small>
+                        </td>
+                        <td>
+                            <!-- Claims Executive Action Form -->
+                            <form th:action="@{/claims/update-status}" method="post" style="display: flex; flex-direction: column; gap: 0.35rem;">
+                                <input type="hidden" name="claimId" th:value="${c.id}">
+                                <div style="display: flex; gap: 0.25rem;">
+                                    <select name="status" class="form-control" style="font-size: 0.75rem; padding: 0.2rem; width: 125px;">
+                                        <option value="UNDER_VERIFICATION">Verify</option>
+                                        <option value="DOCUMENTS_REQUIRED">Request Docs</option>
+                                        <option value="APPROVED">Approve</option>
+                                        <option value="REJECTED">Reject</option>
+                                    </select>
+                                    <input type="number" name="approvedAmount" th:value="${c.claimedAmount}" placeholder="Approved LKR" class="form-control" style="font-size: 0.75rem; padding: 0.2rem; width: 95px;">
+                                </div>
+                                <div style="display: flex; gap: 0.25rem;">
+                                    <input type="text" name="remarks" placeholder="Assessor Remarks" class="form-control" style="font-size: 0.75rem; padding: 0.2rem; width: 155px;">
+                                    <button type="submit" class="btn btn-primary" style="font-size: 0.75rem; padding: 0.2rem 0.5rem;">Update</button>
+                                </div>
+                            </form>
+                        </td>
+                        <td>
+                            <div style="display: flex; gap: 0.35rem; align-items: center;">
+                                <a th:href="@{/claims/track/{id}(id=${c.id})}" class="btn btn-secondary" style="font-size: 0.75rem; padding: 0.3rem 0.5rem;">Track</a>
+                                <a th:href="@{/claims/edit/{id}(id=${c.id})}" class="btn btn-secondary" style="font-size: 0.75rem; padding: 0.3rem 0.5rem;">Edit</a>
+                                <form th:action="@{/claims/delete/{id}(id=${c.id})}" method="post" onsubmit="return confirm('Are you sure you want to delete this claim from database?');">
+                                    <button type="submit" class="btn btn-danger" style="font-size: 0.75rem; padding: 0.3rem 0.5rem;">Delete</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</div>
+</body>
+</html>
