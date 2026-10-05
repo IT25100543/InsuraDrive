@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>My Profile - Customer Portal</title>
+  <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="app-container">
+  <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+  <main class="main-content">
+    <div style="margin-bottom: 2rem;">
+      <h2>My Customer Profile</h2>
+      <p style="color: var(--text-muted); font-size: 0.875rem; margin-top: 0.25rem;">
+        Manage your contact details and view identity verification records.
+      </p>
+    </div>
+
+    <div th:if="${successMessage}" class="alert alert-success">
+      <span th:text="${successMessage}">Profile updated successfully.</span>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+      <!-- Identity Card (Read-only) -->
+      <div class="glass-panel" style="padding: 1.75rem;">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--line);">
+          <h3 style="font-size: 1.1rem; color: var(--text-primary);">Identity &amp; Account</h3>
+          <span class="badge badge-active" th:text="${customer.user != null ? customer.user.accountStatus : 'Active'}">Active</span>
+        </div>
+
+        <div style="display: grid; gap: 1.25rem;">
+          <div>
+            <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-3); text-transform: uppercase;">Full Name</div>
+            <div style="font-size: 1rem; font-weight: 700; color: var(--text); margin-top: 0.2rem;" th:text="${customer.fullName}">Full Name</div>
+          </div>
+
+          <div>
+            <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-3); text-transform: uppercase;">Username</div>
+            <div style="font-size: 0.95rem; font-family: monospace; color: var(--brand); margin-top: 0.2rem;" th:text="${customer.user != null ? customer.user.username : '-'}">username</div>
+          </div>
+
+          <div>
+            <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-3); text-transform: uppercase;">Registered Email</div>
+            <div style="font-size: 0.95rem; color: var(--text-2); margin-top: 0.2rem;" th:text="${customer.user != null ? customer.user.email : customer.email}">email@example.com</div>
+          </div>
+
+          <div>
+            <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-3); text-transform: uppercase;">National Identity Card (NIC)</div>
+            <div style="font-size: 0.95rem; font-family: monospace; font-weight: 700; color: var(--text); margin-top: 0.2rem;" th:text="${customer.nic}">NIC</div>
+          </div>
+
+          <div>
+            <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-3); text-transform: uppercase;">Member Since</div>
+            <div style="font-size: 0.9rem; color: var(--text-3); margin-top: 0.2rem;" th:text="${customer.user != null && customer.user.createdDate != null ? #temporals.format(customer.user.createdDate, 'yyyy-MM-dd HH:mm') : 'Active Member'}">Date</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Editable Contact & Address Information -->
+      <div class="glass-panel" style="padding: 1.75rem;">
+        <div style="margin-bottom: 1.5rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--line);">
+          <h3 style="font-size: 1.1rem; color: var(--text-primary);">Contact &amp; Address</h3>
+        </div>
+
+        <form th:action="@{/customer/profile}" method="post">
+          <div class="form-group">
+            <label class="form-label" for="phoneNumber">Primary Phone Number</label>
+            <input id="phoneNumber" type="text" name="phoneNumber" class="form-control" th:value="${customer.phoneNumber}" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="middleName">Middle Name</label>
+            <input id="middleName" type="text" name="middleName" class="form-control" th:value="${customer.middleName}">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="street">Street Address</label>
+            <input id="street" type="text" name="street" class="form-control" th:value="${customer.street}" required>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div class="form-group">
+              <label class="form-label" for="city">City</label>
+              <input id="city" type="text" name="city" class="form-control" th:value="${customer.city}" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="postalCode">Postal Code</label>
+              <input id="postalCode" type="text" name="postalCode" class="form-control" th:value="${customer.postalCode}" required>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary" style="margin-top: 0.5rem; width: 100%;">Save Changes</button>
+        </form>
+      </div>
+    </div>
+  </main>
+</div>
+</body>
+</html>

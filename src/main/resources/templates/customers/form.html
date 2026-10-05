@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Register Customer - InsuraDrive</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="app-container">
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+    <main class="main-content">
+        <div style="max-width: 720px; margin: 0 auto;">
+            <div class="glass-panel" style="padding: 2.2rem;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem;">
+                    <div>
+                        <h2 style="color: var(--text-primary); margin-bottom: 0.35rem;">Register New Customer</h2>
+                        <p style="color: var(--text-secondary); font-size: 0.88rem;">
+                            Customer Onboarding &amp; Profile Creation
+                        </p>
+                    </div>
+                    <span class="badge badge-active">Onboarding</span>
+                </div>
+
+                <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}">Error message</div>
+                <div th:if="${param.error}" class="alert alert-danger" th:text="${param.error}">Error message</div>
+
+                <form th:action="@{/customers/save}" th:object="${customer}" method="post" novalidate>
+                    <div class="form-group">
+                        <label class="form-label">Full Legal Name *</label>
+                        <input type="text" th:field="*{fullName}" class="form-control" th:errorclass="is-invalid"
+                               placeholder="e.g. Sunil Rathnayake" required>
+                        <span class="field-error" th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}">Name error</span>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem;">
+                        <div class="form-group">
+                            <label class="form-label">National Identity Card (NIC) *</label>
+                            <input type="text" th:field="*{nic}" class="form-control" th:errorclass="is-invalid"
+                                   placeholder="e.g. 199182746538 or 912345678V" required>
+                            <span class="field-error" th:if="${#fields.hasErrors('nic')}" th:errors="*{nic}">NIC error</span>
+                            <small style="color: var(--text-muted); font-size: 0.75rem;">12-digit standard or 9-digit + V</small>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Driving License Number</label>
+                            <input type="text" th:field="*{drivingLicenseNo}" class="form-control" th:errorclass="is-invalid"
+                                   placeholder="e.g. B8765432">
+                            <span class="field-error" th:if="${#fields.hasErrors('drivingLicenseNo')}" th:errors="*{drivingLicenseNo}">License error</span>
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem;">
+                        <div class="form-group">
+                            <label class="form-label">Email Address *</label>
+                            <input type="email" th:field="*{email}" class="form-control" th:errorclass="is-invalid"
+                                   placeholder="sunil.r@example.com" required>
+                            <span class="field-error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}">Valid email required</span>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Phone Number *</label>
+                            <input type="tel" th:field="*{phone}" class="form-control" th:errorclass="is-invalid"
+                                   placeholder="+94 77 123 4567" required>
+                            <span class="field-error" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}">Phone format error</span>
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 1.25rem;">
+                        <div class="form-group">
+                            <label class="form-label">Street Address *</label>
+                            <input type="text" th:field="*{street}" class="form-control" th:errorclass="is-invalid"
+                                   placeholder="No. 45, Temple Road" required>
+                            <span class="field-error" th:if="${#fields.hasErrors('street')}" th:errors="*{street}">Street required</span>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">City *</label>
+                            <input type="text" th:field="*{city}" class="form-control" th:errorclass="is-invalid"
+                                   placeholder="Colombo" required>
+                            <span class="field-error" th:if="${#fields.hasErrors('city')}" th:errors="*{city}">City required</span>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Postal Code *</label>
+                            <input type="text" th:field="*{postalCode}" class="form-control" th:errorclass="is-invalid"
+                                   placeholder="00300" required>
+                            <span class="field-error" th:if="${#fields.hasErrors('postalCode')}" th:errors="*{postalCode}">Postal code</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Verification Scan Document (PDF / Image)</label>
+                        <input type="text" name="documentFile" class="form-control" value="nic_verified_scan.pdf">
+                        <small style="color: var(--text-muted); font-size: 0.75rem;">Digital file will be securely logged and linked to customer profile.</small>
+                    </div>
+
+                    <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 2rem;">
+                        <a th:href="@{/customers}" class="btn btn-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-primary">Save Customer</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+</div>
+</body>
+</html>

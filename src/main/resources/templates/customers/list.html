@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Customer Directory - InsuraDrive</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="app-container">
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+    <main class="main-content">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+            <div>
+                <h2>Customer Management</h2>
+                <p style="color: var(--text-secondary); font-size: 0.9rem;">
+                    Manage customer profiles, contact information, and document verification.
+                </p>
+            </div>
+            <div>
+                <a th:href="@{/customers/new}" class="btn btn-primary">Register New Customer</a>
+            </div>
+        </div>
+
+        <!-- Flash alerts -->
+        <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}">Action completed successfully.</div>
+        <div th:if="${param.success}" class="alert alert-success" th:text="${param.success}">Action completed successfully.</div>
+        <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}">An error occurred.</div>
+        <div th:if="${param.error}" class="alert alert-danger" th:text="${param.error}">An error occurred.</div>
+
+        <!-- Search Bar -->
+        <div class="glass-panel" style="padding: 1rem 1.5rem; margin-bottom: 1.5rem;">
+            <form th:action="@{/customers}" method="get" style="display: flex; gap: 1rem; align-items: center;">
+                <input type="text" name="search" th:value="${searchQuery}" placeholder="Search customer by name..." class="form-control" style="max-width: 380px;">
+                <button type="submit" class="btn btn-primary">Search</button>
+                <a th:href="@{/customers}" class="btn btn-secondary">Clear</a>
+            </form>
+        </div>
+
+        <div class="glass-panel" style="padding: 1.5rem;">
+            <div class="table-responsive">
+                <table class="custom-table">
+                    <thead>
+                    <tr>
+                        <th>NIC / Passport</th>
+                        <th>Full Name</th>
+                        <th>Contact Details</th>
+                        <th>Driving License</th>
+                        <th>Verification Status</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="c : ${customers}">
+                        <td th:text="${c.nicPassport}" style="font-weight: 600; color: var(--primary-accent);">NIC</td>
+                        <td>
+                            <strong th:text="${c.fullName}">Name</strong><br>
+                            <small th:text="${c.address}" style="color: var(--text-muted); font-size: 0.8rem;">Address</small>
+                        </td>
+                        <td>
+                            <span th:text="${c.email}">Email</span><br>
+                            <small th:text="${c.phone}" style="color: var(--text-muted);">Phone</small>
+                        </td>
+                        <td>
+                            <span th:text="${c.drivingLicenseNo != null ? c.drivingLicenseNo : 'N/A'}">B123456</span><br>
+                            <small style="color: var(--text-muted);" th:text="${'Doc: ' + c.documentName}">doc.pdf</small>
+                        </td>
+                        <td>
+                                    <span class="badge"
+                                          th:classappend="${c.verificationStatus != null ? 'badge-' + #strings.toLowerCase(c.verificationStatus) : 'badge-active'}"
+                                          th:text="${c.verificationStatus}">VERIFIED</span>
+
+                            <!-- Quick Verification Switcher for CRO -->
+                            <form th:action="@{/customers/verify/{id}(id=${c.id})}" method="post" style="margin-top: 0.35rem; display: flex; gap: 0.25rem;">
+                                <select name="status" class="form-control" style="font-size: 0.75rem; padding: 0.15rem 0.3rem; width: 115px;">
+                                    <option value="VERIFIED" th:selected="${c.verificationStatus != null && c.verificationStatus.name() == 'VERIFIED'}">Verified</option>
+                                    <option value="PENDING_VERIFICATION" th:selected="${c.verificationStatus != null && c.verificationStatus.name() == 'PENDING_VERIFICATION'}">Pending</option>
+                                    <option value="DOCUMENTS_REQUIRED" th:selected="${c.verificationStatus != null && c.verificationStatus.name() == 'DOCUMENTS_REQUIRED'}">Req Docs</option>
+                                    <option value="REJECTED" th:selected="${c.verificationStatus != null && c.verificationStatus.name() == 'REJECTED'}">Rejected</option>
+                                </select>
+                                <button type="submit" class="btn btn-secondary" style="font-size: 0.75rem; padding: 0.2rem 0.4rem;">Set</button>
+                            </form>
+                        </td>
+                        <td>
+                            <div style="display: flex; gap: 0.5rem; align-items: center;">
+                                <a th:href="@{/customers/edit/{id}(id=${c.id})}" class="btn btn-secondary" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">Edit</a>
+                                <form th:action="@{/customers/delete/{id}(id=${c.id})}" method="post" onsubmit="return confirm('Are you sure you want to remove this customer record?');">
+                                    <button type="submit" class="btn btn-danger" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">Delete</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</div>
+</body>
+</html>
