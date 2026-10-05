@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>InsuraDrive - Payment Form</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body class="bg-light">
+<div class="container mt-5" style="max-width: 600px;">
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+            <h3 class="card-title mb-0">Make Premium Payment</h3>
+        </div>
+        <div class="card-body">
+            <form th:action="@{/payments/save}" th:object="${paymentFormDto}" method="post">
+
+                <!-- Policy Selection -->
+                <div class="mb-3">
+                    <label for="policyId" class="form-label">Select Policy</label>
+                    <select id="policyId" th:field="*{policyId}" class="form-select" th:classappend="${#fields.hasErrors('policyId')} ? 'is-invalid' : ''">
+                        <option value="">-- Choose Insurance Policy --</option>
+                        <option th:each="policy : ${policies}"
+                                th:value="${policy.id}"
+                                th:text="${'Policy #' + policy.id + ' - LKR ' + policy.annualPremium}">Policy Option</option>
+                    </select>
+                    <div class="invalid-feedback" th:if="${#fields.hasErrors('policyId')}" th:errors="*{policyId}">Invalid Policy</div>
+                </div>
+
+                <!-- Premium Amount -->
+                <div class="mb-3">
+                    <label for="amount" class="form-label">Payment Amount (LKR)</label>
+                    <input type="number" step="0.01" id="amount" th:field="*{amount}" class="form-control" placeholder="0.00" required>
+                </div>
+
+                <!-- Payment Method (Strategy Pattern Choice) -->
+                <div class="mb-3">
+                    <label for="paymentMethod" class="form-label">Payment Method</label>
+                    <select id="paymentMethod" th:field="*{paymentMethod}" class="form-select" required>
+                        <option value="Card">Credit / Debit Card</option>
+                        <option value="Bank Transfer">Bank Transfer</option>
+                        <option value="Cash">Cash Desk</option>
+                    </select>
+                </div>
+
+                <!-- Installment Number -->
+                <div class="mb-3">
+                    <label for="installmentNo" class="form-label">Installment Number</label>
+                    <input type="number" id="installmentNo" th:field="*{installmentNo}" class="form-control" min="1" value="1">
+                </div>
+
+                <div class="d-flex justify-content-between mt-4">
+                    <a th:href="@{/payments}" class="btn btn-secondary">Cancel</a>
+                    <button type="submit" class="btn btn-success">Process Payment</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>
