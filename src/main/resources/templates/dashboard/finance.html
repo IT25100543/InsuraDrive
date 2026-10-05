@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Finance & Payments - InsuraDrive</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="app-container">
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+    <main class="main-content">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <div>
+                <h2>Finance & Payments Supervisor Portal</h2>
+                <p style="color: var(--text-muted); font-size: 0.875rem; margin-top: 0.25rem;">Track premium collections, issue payment receipts, and review ledger histories.</p>
+            </div>
+            <div>
+                <a th:href="@{/payments/new}" class="btn btn-success">Record Payment</a>
+            </div>
+        </div>
+
+        <div class="glass-panel" style="padding: 1.5rem;">
+            <h3 style="margin-bottom: 1rem; font-size: 1rem;">Financial Transaction Ledger</h3>
+            <div class="table-responsive">
+                <table class="custom-table">
+                    <thead>
+                    <tr>
+                        <th>Transaction ID</th>
+                        <th>Policy Number</th>
+                        <th>Payment Date</th>
+                        <th>Method</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th>Receipt</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="p : ${recentPayments}">
+                        <td th:text="${p.transactionId}" style="font-weight: 600; color: var(--primary-accent);">TXN-000</td>
+                        <td th:text="${p.policy != null ? p.policy.policyNumber : 'N/A'}">POL-000</td>
+                        <td th:text="${#temporals.format(p.paymentDate, 'yyyy-MM-dd HH:mm')}">Date</td>
+                        <td th:text="${p.paymentMethod}">Method</td>
+                        <td th:text="${'LKR ' + #numbers.formatDecimal(p.amount, 1, 'COMMA', 2, 'POINT')}" style="font-weight: 600; color: var(--accent);">LKR 0.00</td>
+                        <td>
+                            <span class="badge badge-completed" th:text="${p.status}">COMPLETED</span>
+                        </td>
+                        <td>
+                            <a th:href="@{'/payments/receipt/' + ${p.id}}" class="btn btn-secondary" style="padding: 0.25rem 0.6rem; font-size: 0.75rem;">View Receipt</a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</div>
+</body>
+</html>

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Make Payment - Customer Portal</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="app-container">
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+    <main class="main-content">
+        <div style="margin-bottom: 2rem;">
+            <h2>Pay Premium Online</h2>
+            <p style="color: var(--text-muted); font-size: 0.875rem; margin-top: 0.25rem;">
+                Instant premium settlement with digital receipt generation.
+            </p>
+        </div>
+
+        <div class="glass-panel" style="max-width: 650px; padding: 2rem;">
+            <form th:action="@{/customer/payments/pay}" method="post">
+                <div class="form-group">
+                    <label class="form-label" for="policyId">Select Policy to Pay <span style="color:#dc2626;">*</span></label>
+                    <select id="policyId" name="policyId" class="form-control" required>
+                        <option value="" disabled th:selected="${payment.policy == null}">-- Select policy --</option>
+                        <option th:each="p : ${policies}"
+                                th:value="${p.id}"
+                                th:selected="${payment.policy != null && payment.policy.id == p.id}"
+                                th:text="${p.policyNumber + ' (' + (p.vehicle != null ? p.vehicle.registrationNo : 'N/A') + ') - Premium: LKR ' + #numbers.formatDecimal(p.annualPremium, 1, 'COMMA', 2, 'POINT')}">
+                            POL-000
+                        </option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="paymentMethod">Payment Method <span style="color:#dc2626;">*</span></label>
+                    <select id="paymentMethod" name="paymentMethod" class="form-control" required>
+                        <option value="Visa / MasterCard Credit Card" selected>Visa / MasterCard Credit Card</option>
+                        <option value="Debit Card">Debit Card</option>
+                        <option value="Online Banking Direct Transfer">Online Banking Direct Transfer</option>
+                        <option value="LankaQR Digital Wallet">LankaQR Digital Wallet</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="paymentType">Payment Type</label>
+                    <select id="paymentType" name="paymentType" class="form-control">
+                        <option value="FULL_PAYMENT" selected>Full Annual Payment</option>
+                        <option value="INSTALLMENT_1">Quarterly Installment 1</option>
+                        <option value="INSTALLMENT_2">Quarterly Installment 2</option>
+                        <option value="INSTALLMENT_3">Quarterly Installment 3</option>
+                        <option value="INSTALLMENT_4">Quarterly Installment 4</option>
+                    </select>
+                </div>
+
+                <div class="info-box" style="margin-top: 1.5rem; margin-bottom: 1.5rem;">
+                    <strong>Security Guarantee:</strong> All payment transactions are encrypted using TLS 1.3 standards. An official digital tax receipt with a unique verification code will be generated immediately upon completion.
+                </div>
+
+                <div style="display: flex; gap: 1rem;">
+                    <button type="submit" class="btn btn-success" style="flex: 1;">Complete Payment &amp; Get Receipt</button>
+                    <a th:href="@{/customer/payments}" class="btn btn-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </main>
+</div>
+</body>
+</html>

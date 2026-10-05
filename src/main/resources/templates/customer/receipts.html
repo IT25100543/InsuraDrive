@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>My Receipts - Customer Portal</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="app-container">
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+    <main class="main-content">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <div>
+                <h2>Payment Receipts</h2>
+                <p style="color: var(--text-muted); font-size: 0.875rem; margin-top: 0.25rem;">
+                    Download or print official receipts issued for your insurance premium settlements.
+                </p>
+            </div>
+        </div>
+
+        <div class="glass-panel" style="padding: 1.5rem;">
+            <div class="table-responsive">
+                <table class="custom-table">
+                    <thead>
+                    <tr>
+                        <th>Receipt No.</th>
+                        <th>Transaction Date</th>
+                        <th>Policy No.</th>
+                        <th>Vehicle Reg</th>
+                        <th>Amount Paid</th>
+                        <th>Payment Method</th>
+                        <th>Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:if="${#lists.isEmpty(payments)}">
+                        <td colspan="7" style="text-align: center; color: var(--text-muted); padding: 2.5rem;">
+                            No payment receipts generated yet.
+                        </td>
+                    </tr>
+                    <tr th:each="pmt : ${payments}">
+                        <td th:text="${pmt.receiptNumber != null ? pmt.receiptNumber : pmt.transactionId}" style="font-weight: 700; color: var(--brand);">RCP-2026-000</td>
+                        <td th:text="${#temporals.format(pmt.paymentDate, 'yyyy-MM-dd HH:mm')}">2026-01-01</td>
+                        <td th:text="${pmt.policy != null ? pmt.policy.policyNumber : 'N/A'}" style="font-weight: 600;">POL-000</td>
+                        <td th:text="${pmt.policy != null && pmt.policy.vehicle != null ? pmt.policy.vehicle.registrationNo : 'N/A'}">WP CAB-1234</td>
+                        <td th:text="${'LKR ' + #numbers.formatDecimal(pmt.amount, 1, 'COMMA', 2, 'POINT')}" style="font-weight: 700;">0.00</td>
+                        <td th:text="${pmt.paymentMethod}">Credit Card</td>
+                        <td>
+                            <a th:href="@{'/customer/receipts/' + ${pmt.id}}" class="btn btn-primary" style="padding: 0.35rem 0.75rem; font-size: 0.75rem;">
+                                View / Print Receipt
+                            </a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</div>
+</body>
+</html>

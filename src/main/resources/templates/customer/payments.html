@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Payments - Customer Portal</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="app-container">
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+    <main class="main-content">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <div>
+                <h2>Premium Payments</h2>
+                <p style="color: var(--text-muted); font-size: 0.875rem; margin-top: 0.25rem;">
+                    View settled payment transactions and make pending premium contributions.
+                </p>
+            </div>
+            <div>
+                <a th:href="@{/customer/payments/pay}" class="btn btn-primary">Make a Payment</a>
+            </div>
+        </div>
+
+        <div th:if="${successMessage}" class="alert alert-success">
+            <span th:text="${successMessage}">Payment processed successfully.</span>
+        </div>
+
+        <!-- Policies awaiting payment -->
+        <div class="glass-panel" style="padding: 1.5rem; margin-bottom: 2rem;"
+             th:with="pendingPolicies=${policies.?[status.name() == 'PENDING_PAYMENT']}">
+            <h3 style="margin-bottom: 1rem; color: var(--text-primary);">Policies Awaiting Payment</h3>
+            <div class="table-responsive">
+                <table class="custom-table">
+                    <thead>
+                    <tr>
+                        <th>Policy No.</th>
+                        <th>Vehicle</th>
+                        <th>Coverage Plan</th>
+                        <th>Annual Premium</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:if="${#lists.isEmpty(pendingPolicies)}">
+                        <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 1.5rem;">
+                            Great news! You have no outstanding policy payments pending settlement.
+                        </td>
+                    </tr>
+                    <tr th:each="p : ${pendingPolicies}">
+                        <td th:text="${p.policyNumber}" style="font-weight: 700; color: var(--brand);">POL-000</td>
+                        <td th:text="${p.vehicle != null ? p.vehicle.registrationNo : 'N/A'}">REG-000</td>
+                        <td th:text="${p.policyType}">Type</td>
+                        <td th:text="${'LKR ' + #numbers.formatDecimal(p.annualPremium, 1, 'COMMA', 2, 'POINT')}" style="font-weight: 700; color: var(--bad);">0.00</td>
+                        <td>
+                            <span class="badge badge-pending">PENDING PAYMENT</span>
+                        </td>
+                        <td>
+                            <a th:href="@{'/customer/payments/pay?policyId=' + ${p.id}}" class="btn btn-success" style="padding: 0.35rem 0.75rem; font-size: 0.75rem;">Pay Now</a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- All Payment Transactions -->
+        <div class="glass-panel" style="padding: 1.5rem;">
+            <h3 style="margin-bottom: 1rem; color: var(--text-primary);">Settled Transactions History</h3>
+            <div class="table-responsive">
+                <table class="custom-table">
+                    <thead>
+                    <tr>
+                        <th>Transaction ID</th>
+                        <th>Policy No.</th>
+                        <th>Receipt No.</th>
+                        <th>Amount Paid</th>
+                        <th>Payment Date</th>
+                        <th>Method</th>
+                        <th>Status</th>
+                        <th>Receipt</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:if="${#lists.isEmpty(payments)}">
+                        <td colspan="8" style="text-align: center; color: var(--text-muted); padding: 2.5rem;">
+                            No payment transactions recorded yet.
+                        </td>
+                    </tr>
+                    <tr th:each="pmt : ${payments}">
+                        <td th:text="${pmt.transactionId}" style="font-family: monospace; font-weight: 700;">TXN-000</td>
+                        <td th:text="${pmt.policy != null ? pmt.policy.policyNumber : 'N/A'}" style="font-weight: 600;">POL-000</td>
+                        <td th:text="${pmt.receiptNumber != null ? pmt.receiptNumber : '-'}" style="font-weight: 700; color: var(--brand);">RCP-000</td>
+                        <td th:text="${'LKR ' + #numbers.formatDecimal(pmt.amount, 1, 'COMMA', 2, 'POINT')}" style="font-weight: 700;">0.00</td>
+                        <td th:text="${#temporals.format(pmt.paymentDate, 'yyyy-MM-dd HH:mm')}">2026-01-01</td>
+                        <td th:text="${pmt.paymentMethod}">Credit Card</td>
+                        <td>
+                            <span class="badge" th:classappend="${'badge-' + #strings.toLowerCase(pmt.status)}" th:text="${pmt.status}">COMPLETED</span>
+                        </td>
+                        <td>
+                            <a th:href="@{'/customer/receipts/' + ${pmt.id}}" class="btn btn-secondary" style="padding: 0.35rem 0.65rem; font-size: 0.75rem;">View Receipt</a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</div>
+</body>
+</html>
