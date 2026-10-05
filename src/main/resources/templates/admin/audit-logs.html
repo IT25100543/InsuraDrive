@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Audit Logs - InsuraDrive</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="app-container">
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+    <main class="main-content">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <div>
+                <h2>Regulatory Compliance Audit Logs</h2>
+                <p style="color: var(--text-muted); font-size: 0.875rem; margin-top: 0.25rem;">Complete immutable log trail of system activities, user updates, and state transitions.</p>
+            </div>
+        </div>
+
+        <div class="glass-panel" style="padding: 1.5rem;">
+            <div class="table-responsive">
+                <table class="custom-table">
+                    <thead>
+                    <tr>
+                        <th>Timestamp</th>
+                        <th>Operator User</th>
+                        <th>Assigned Role</th>
+                        <th>Action Taken</th>
+                        <th>Module</th>
+                        <th>Details</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="log : ${auditLogs}">
+                        <td th:text="${#temporals.format(log.timestamp, 'yyyy-MM-dd HH:mm:ss')}" style="font-size: 0.85rem; color: var(--text-muted);">Time</td>
+                        <td th:text="${log.username}" style="font-weight: 600;">User</td>
+                        <td>
+                            <span class="badge badge-active" th:text="${log.userRole}">ROLE</span>
+                        </td>
+                        <td th:text="${log.action}" style="color: var(--primary-accent); font-weight: 600;">ACTION</td>
+                        <td th:text="${log.targetModule}">Module</td>
+                        <td th:text="${log.details}">Details</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</div>
+</body>
+</html>
