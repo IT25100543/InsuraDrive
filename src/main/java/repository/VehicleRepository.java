@@ -33,3 +33,4 @@ public interface VehicleRepository extends JpaRepository<Vehicle, Long> {
     @Query("SELECT v FROM Vehicle v WHERE v.customer.userID = :customerId")
     List<Vehicle> findByCustomerId(@Param("customerId") Long customerId);
 }
+
