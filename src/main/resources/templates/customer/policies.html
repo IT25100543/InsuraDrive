@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>My Policies - Customer Portal</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="app-container">
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+    <main class="main-content">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <div>
+                <h2>My Insurance Policies</h2>
+                <p style="color: var(--text-muted); font-size: 0.875rem; margin-top: 0.25rem;">
+                    View policy terms, coverage periods, and settlement statuses.
+                </p>
+            </div>
+            <div>
+                <a th:href="@{/customer/apply}" class="btn btn-primary">Apply for Policy</a>
+            </div>
+        </div>
+
+        <div class="glass-panel" style="padding: 1.5rem;">
+            <div class="table-responsive">
+                <table class="custom-table">
+                    <thead>
+                    <tr>
+                        <th>Policy No.</th>
+                        <th>Vehicle Reg</th>
+                        <th>Coverage Plan</th>
+                        <th>Sum Insured</th>
+                        <th>Annual Premium</th>
+                        <th>Coverage Period</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:if="${#lists.isEmpty(policies)}">
+                        <td colspan="8" style="text-align: center; color: var(--text-muted); padding: 2.5rem;">
+                            You do not have any active or pending policies.
+                            <div style="margin-top: 0.75rem;">
+                                <a th:href="@{/customer/apply}" class="btn btn-primary" style="font-size: 0.82rem;">Apply for Insurance</a>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr th:each="p : ${policies}">
+                        <td>
+                            <a th:href="@{'/customer/policies/' + ${p.id}}" style="font-weight: 700; color: var(--brand); text-decoration: none;" th:text="${p.policyNumber}">POL-000</a>
+                        </td>
+                        <td th:text="${p.vehicle != null ? p.vehicle.registrationNo : 'N/A'}" style="font-weight: 600;">REG-000</td>
+                        <td th:text="${p.policyType}">Comprehensive</td>
+                        <td th:text="${p.sumInsured != null ? 'LKR ' + #numbers.formatDecimal(p.sumInsured, 1, 'COMMA', 2, 'POINT') : '-'}">0.00</td>
+                        <td th:text="${p.annualPremium != null ? 'LKR ' + #numbers.formatDecimal(p.annualPremium, 1, 'COMMA', 2, 'POINT') : '-'}">0.00</td>
+                        <td style="font-size: 0.82rem; color: var(--text-2);">
+                            <span th:text="${p.startDate != null ? p.startDate : 'N/A'}">2026-01-01</span> to
+                            <span th:text="${p.endDate != null ? p.endDate : 'N/A'}">2027-01-01</span>
+                        </td>
+                        <td>
+                            <span class="badge" th:classappend="${'badge-' + #strings.toLowerCase(p.status)}" th:text="${p.status}">ACTIVE</span>
+                        </td>
+                        <td style="display: flex; gap: 0.5rem; align-items: center;">
+                            <a th:href="@{'/customer/policies/' + ${p.id}}" class="btn btn-secondary" style="padding: 0.35rem 0.65rem; font-size: 0.75rem;">View</a>
+                            <a th:if="${p.status == T(com.insuradrive.model.InsurancePolicy.PolicyStatus).PENDING_PAYMENT}"
+                               th:href="@{'/customer/payments/pay?policyId=' + ${p.id}}"
+                               class="btn btn-success" style="padding: 0.35rem 0.65rem; font-size: 0.75rem;">Pay</a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</div>
+</body>
+</html>
