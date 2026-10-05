@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Official Premium Receipt - InsuraDrive</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="app-container">
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+    <main class="main-content">
+        <div style="display: flex; justify-content: space-between; align-items: center; max-width: 640px; margin: 0 auto 1.5rem;" class="no-print">
+            <a th:href="@{/customer/receipts}" class="btn btn-secondary">Back to Receipts</a>
+            <button onclick="window.print()" class="btn btn-primary">Print Official Receipt</button>
+        </div>
+
+        <div class="receipt-card">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem; border-bottom: 2px solid var(--line); padding-bottom: 1.5rem;">
+                <div>
+                    <div style="display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.4rem;">
+                        <div class="brand-logo" style="width: 28px; height: 28px; font-size: 0.7rem;">ID</div>
+                        <span style="font-weight: 800; font-size: 1.2rem; color: var(--text);">InsuraDrive Insurance PLC</span>
+                    </div>
+                    <p style="font-size: 0.78rem; color: var(--text-3); line-height: 1.4;">
+                        Licensed by the Insurance Regulatory Commission of Sri Lanka (IRCSL)<br>
+                        Head Office: No. 120, Janadhipathi Mawatha, Colombo 01
+                    </p>
+                </div>
+                <div style="text-align: right;">
+                    <span class="badge badge-active" style="font-size: 0.75rem; padding: 0.35rem 0.8rem;">PAYMENT SETTLED</span>
+                    <div style="margin-top: 0.5rem; font-family: monospace; font-weight: 800; font-size: 1.05rem; color: var(--brand);" th:text="${payment.receiptNumber != null ? payment.receiptNumber : payment.transactionId}">RCP-2026-000</div>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem;">
+                <div>
+                    <div style="font-size: 0.72rem; font-weight: 700; color: var(--text-3); text-transform: uppercase;">Issued To Customer</div>
+                    <div style="font-size: 1.05rem; font-weight: 800; color: var(--text); margin-top: 0.2rem;" th:text="${payment.policy != null && payment.policy.customer != null ? payment.policy.customer.fullName : customer.fullName}">Kamal Perera</div>
+                    <div style="font-size: 0.85rem; color: var(--text-2); margin-top: 0.2rem;">
+                        NIC: <span style="font-family: monospace; font-weight: 600;" th:text="${payment.policy != null && payment.policy.customer != null ? payment.policy.customer.nic : customer.nic}">199012345678</span>
+                    </div>
+                </div>
+
+                <div style="text-align: right;">
+                    <div style="font-size: 0.72rem; font-weight: 700; color: var(--text-3); text-transform: uppercase;">Transaction Details</div>
+                    <div style="font-size: 0.85rem; color: var(--text-2); margin-top: 0.2rem;">
+                        Date: <strong th:text="${#temporals.format(payment.paymentDate, 'yyyy-MM-dd HH:mm:ss')}">2026-01-01 12:00:00</strong>
+                    </div>
+                    <div style="font-size: 0.85rem; color: var(--text-2); margin-top: 0.2rem;">
+                        Method: <span th:text="${payment.paymentMethod}">Credit Card</span>
+                    </div>
+                    <div style="font-size: 0.82rem; font-family: monospace; color: var(--text-3); margin-top: 0.2rem;" th:text="${payment.transactionId}">TXN-000000</div>
+                </div>
+            </div>
+
+            <!-- Insured Policy Schedule -->
+            <div style="background: var(--surface-2); border: 1px solid var(--line); border-radius: var(--r-md); padding: 1.25rem; margin-bottom: 2rem;">
+                <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-3); text-transform: uppercase; margin-bottom: 0.75rem;">Insured Policy Coverage Details</div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div>
+                        <span style="font-size: 0.82rem; color: var(--text-3);">Policy Number:</span>
+                        <div style="font-weight: 700; color: var(--brand);" th:text="${payment.policy != null ? payment.policy.policyNumber : 'N/A'}">POL-000</div>
+                    </div>
+                    <div>
+                        <span style="font-size: 0.82rem; color: var(--text-3);">Vehicle Registration:</span>
+                        <div style="font-weight: 700; color: var(--text);" th:text="${payment.policy != null && payment.policy.vehicle != null ? payment.policy.vehicle.registrationNo : 'N/A'}">WP CAB-1234</div>
+                    </div>
+                    <div>
+                        <span style="font-size: 0.82rem; color: var(--text-3);">Vehicle Make/Model:</span>
+                        <div style="color: var(--text-2);" th:text="${payment.policy != null && payment.policy.vehicle != null ? payment.policy.vehicle.makeModel : 'N/A'}">Toyota Prius</div>
+                    </div>
+                    <div>
+                        <span style="font-size: 0.82rem; color: var(--text-3);">Payment Type:</span>
+                        <div style="color: var(--text-2);" th:text="${payment.paymentType}">FULL PAYMENT</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Amount Breakdown -->
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 0; border-top: 2px solid var(--line); border-bottom: 2px solid var(--line); margin-bottom: 2rem;">
+                <div style="font-size: 1.1rem; font-weight: 800; color: var(--text);">Total Amount Settled</div>
+                <div style="font-size: 1.6rem; font-weight: 800; color: var(--brand);" th:text="${'LKR ' + #numbers.formatDecimal(payment.amount, 1, 'COMMA', 2, 'POINT')}">LKR 45,000.00</div>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: flex-end; font-size: 0.78rem; color: var(--text-3);">
+                <div>
+                    <strong>Notice:</strong> This is a computer-generated digital receipt issued by InsuraDrive.<br>
+                    Authorized under Electronic Transactions Act No. 19 of 2006.
+                </div>
+                <div style="text-align: right; font-family: monospace;">
+                    Status: VERIFIED &bull; OK
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+</body>
+</html>
