@@ -3,7 +3,7 @@ package com.insuradrive.service.state.vehicle;
 import com.insuradrive.model.Vehicle;
 
 /**
- 
+
  * binding depends strictly on physical roadworthiness inspection outcomes.
  */
 public interface VehicleInspectionState {
