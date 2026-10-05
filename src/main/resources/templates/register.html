@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Customer Registration - InsuraDrive</title>
+  <link rel="stylesheet" th:href="@{/css/styles.css}">
+  <style>
+    .register-card {
+        width: 100%;
+        max-width: 580px;
+        padding: 2.2rem;
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: var(--r-lg);
+        box-shadow: var(--shadow-md);
+    }
+    .form-grid-2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+    }
+    .form-grid-3 {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 1rem;
+    }
+    .field-error {
+        color: #dc2626;
+        font-size: 0.78rem;
+        margin-top: 0.25rem;
+        font-weight: 600;
+    }
+    .section-divider {
+        margin: 1.5rem 0 1rem;
+        padding-bottom: 0.4rem;
+        border-bottom: 1px solid var(--line);
+        font-size: 0.82rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--brand);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    @media (max-width: 640px) {
+        .form-grid-2, .form-grid-3 {
+            grid-template-columns: 1fr;
+            gap: 0.5rem;
+        }
+        .register-card {
+            padding: 1.5rem;
+        }
+    }
+  </style>
+</head>
+<body>
+<div class="auth-shell">
+  <section class="auth-hero">
+    <a th:href="@{/}" class="brand">
+      <div class="brand-logo">ID</div>
+      <span>InsuraDrive</span>
+    </a>
+    <div>
+      <h1>Protect what matters most.</h1>
+      <p class="lead">Register your customer account to manage your motor insurance policies, vehicle enrollments, online premium settlements, and claim status with complete transparency.</p>
+    </div>
+    <div class="auth-visual">
+      <img th:src="@{/images/login-hero.jpg}" alt="InsuraDrive Vehicle Protection" class="auth-img">
+    </div>
+    <ul class="auth-points">
+      <li>Self-service insurance policy applications</li>
+      <li>Real-time premium calculation & instant receipts</li>
+      <li>Fast claims reporting and verification tracking</li>
+      <li>Secure personal document repository</li>
+    </ul>
+  </section>
+
+  <section class="auth-side" style="padding: 2.5rem 1.5rem;">
+    <div class="register-card">
+      <h2>Create Customer Account</h2>
+      <p class="sub" style="margin-bottom: 1.25rem;">Enter your personal and contact information to register your InsuraDrive account.</p>
+
+      <!-- Server-side alert error -->
+      <div th:if="${registrationError}" style="margin-bottom: 1.25rem; padding: 0.75rem 1rem; background-color: #fee2e2; border: 1px solid #fecaca; color: #dc2626; border-radius: 8px; font-size: 0.875rem;">
+        <span th:text="${registrationError}">Registration error</span>
+      </div>
+
+      <form th:action="@{/register}" th:object="${registrationDto}" method="post">
+        <!-- Section 1: Account Credentials -->
+        <div class="section-divider">
+          Account Credentials
+        </div>
+
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label class="form-label" for="username">Username <span style="color:#dc2626;">*</span></label>
+            <input id="username" type="text" th:field="*{username}" class="form-control" placeholder="e.g. kamal_p" required autofocus>
+            <div class="field-error" th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="email">Email Address <span style="color:#dc2626;">*</span></label>
+            <input id="email" type="email" th:field="*{email}" class="form-control" placeholder="e.g. kamal@gmail.com" required>
+            <div class="field-error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+          </div>
+        </div>
+
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label class="form-label" for="password">Password <span style="color:#dc2626;">*</span></label>
+            <input id="password" type="password" th:field="*{password}" class="form-control" placeholder="At least 6 characters" required>
+            <div class="field-error" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="confirmPassword">Confirm Password <span style="color:#dc2626;">*</span></label>
+            <input id="confirmPassword" type="password" th:field="*{confirmPassword}" class="form-control" placeholder="Re-type password" required>
+            <div class="field-error" th:if="${#fields.hasErrors('confirmPassword')}" th:errors="*{confirmPassword}"></div>
+          </div>
+        </div>
+
+        <!-- Section 2: Personal Identification -->
+        <div class="section-divider">
+          Personal Information
+        </div>
+
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label class="form-label" for="nic">National Identity Card (NIC) <span style="color:#dc2626;">*</span></label>
+            <input id="nic" type="text" th:field="*{nic}" class="form-control" placeholder="e.g. 199512345678 or 951234567V" required>
+            <div class="field-error" th:if="${#fields.hasErrors('nic')}" th:errors="*{nic}"></div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="phoneNumber">Phone Number <span style="color:#dc2626;">*</span></label>
+            <input id="phoneNumber" type="text" th:field="*{phoneNumber}" class="form-control" placeholder="e.g. 0771234567" required>
+            <div class="field-error" th:if="${#fields.hasErrors('phoneNumber')}" th:errors="*{phoneNumber}"></div>
+          </div>
+        </div>
+
+        <div class="form-grid-3">
+          <div class="form-group">
+            <label class="form-label" for="firstName">First Name <span style="color:#dc2626;">*</span></label>
+            <input id="firstName" type="text" th:field="*{firstName}" class="form-control" placeholder="e.g. Kamal" required>
+            <div class="field-error" th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}"></div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="middleName">Middle Name</label>
+            <input id="middleName" type="text" th:field="*{middleName}" class="form-control" placeholder="Optional">
+            <div class="field-error" th:if="${#fields.hasErrors('middleName')}" th:errors="*{middleName}"></div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="lastName">Last Name <span style="color:#dc2626;">*</span></label>
+            <input id="lastName" type="text" th:field="*{lastName}" class="form-control" placeholder="e.g. Perera" required>
+            <div class="field-error" th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}"></div>
+          </div>
+        </div>
+
+        <!-- Section 3: Residential Address -->
+        <div class="section-divider">
+          Residential Address
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="street">Street Address <span style="color:#dc2626;">*</span></label>
+          <input id="street" type="text" th:field="*{street}" class="form-control" placeholder="e.g. No. 45, Temple Road" required>
+          <div class="field-error" th:if="${#fields.hasErrors('street')}" th:errors="*{street}"></div>
+        </div>
+
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label class="form-label" for="city">City <span style="color:#dc2626;">*</span></label>
+            <input id="city" type="text" th:field="*{city}" class="form-control" placeholder="e.g. Colombo" required>
+            <div class="field-error" th:if="${#fields.hasErrors('city')}" th:errors="*{city}"></div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="postalCode">Postal Code <span style="color:#dc2626;">*</span></label>
+            <input id="postalCode" type="text" th:field="*{postalCode}" class="form-control" placeholder="e.g. 00300" required>
+            <div class="field-error" th:if="${#fields.hasErrors('postalCode')}" th:errors="*{postalCode}"></div>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width: 100%; padding: .85rem; font-size: 0.95rem; margin-top: 1rem;">Create Customer Account</button>
+
+        <div style="text-align: center; margin-top: 1.25rem; font-size: 0.875rem; color: var(--text-2);">
+          Already have an account? <a th:href="@{/login}" style="font-weight: 700; color: var(--brand); text-decoration: underline;">Sign in</a>
+        </div>
+      </form>
+    </div>
+  </section>
+</div>
+</body>
+</html>
