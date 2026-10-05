@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Compliance Audit Report - InsuraDrive</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <style>
+        @media print {
+            .navbar, .sidebar, .no-print { display: none !important; }
+            .app-container { margin: 0; padding: 0; }
+            .main-content { padding: 0; }
+            .glass-panel { border: 1px solid #ccc; box-shadow: none; }
+        }
+    </style>
+</head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="app-container">
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+    <main class="main-content">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;" class="no-print">
+            <div>
+                <h2>Official Compliance & Risk Audit Report</h2>
+                <p style="color: var(--text-muted); font-size: 0.875rem;">
+                    Official InsuraDrive Audit Record | Central Governance & Regulatory Compliance
+                </p>
+            </div>
+            <div style="display: flex; gap: 0.75rem;">
+                <a th:href="@{/reports}" class="btn btn-secondary">All Reports</a>
+                <button onclick="window.print()" class="btn btn-secondary">Print / Save as PDF</button>
+                <form th:action="@{/reports/share}" method="post">
+                    <input type="hidden" name="branch" th:value="${report.branch}">
+                    <input type="hidden" name="reportType" th:value="${report.reportType}">
+                    <button type="submit" class="btn btn-primary">Share with Branch Manager</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Printable Report Document Container -->
+        <div class="glass-panel" style="padding: 2.5rem; background: var(--card-bg);">
+            <div style="border-bottom: 2px solid var(--primary-accent); padding-bottom: 1rem; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: flex-end;">
+                <div>
+                    <h1 style="font-size: 1.75rem; color: var(--primary-accent); margin: 0;">InsuraDrive Vehicle Insurance Ltd</h1>
+                    <p style="margin: 0.25rem 0 0 0; color: var(--text-muted);">Central Governance, Risk & Regulatory Compliance Division</p>
+                </div>
+                <div style="text-align: right;">
+                    <span class="badge badge-active" style="font-size: 0.85rem;" th:text="${report.complianceStatus}">HEALTHY</span>
+                    <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem;">Date: <strong th:text="${report.generatedDate}">2026-09-14</strong></div>
+                </div>
+            </div>
+
+            <!-- Report Metadata -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem; background: var(--surface-2); border: 1px solid var(--line); padding: 1rem; border-radius: 8px;">
+                <div>
+                    <small style="color: var(--text-muted); text-transform: uppercase;">Scope / Branch</small>
+                    <div style="font-weight: 600;" th:text="${report.branch}">Colombo Main</div>
+                </div>
+                <div>
+                    <small style="color: var(--text-muted); text-transform: uppercase;">Report Classification</small>
+                    <div style="font-weight: 600;" th:text="${report.reportType}">Comprehensive Audit</div>
+                </div>
+                <div>
+                    <small style="color: var(--text-muted); text-transform: uppercase;">Audit Period</small>
+                    <div style="font-weight: 600;" th:text="${startDate + ' to ' + endDate}">2026-01-01 to 2026-12-31</div>
+                </div>
+            </div>
+
+            <!-- Key Metrics Grid -->
+            <h3 style="margin-bottom: 1rem;">1. Executive Underwriting & Claims Performance</h3>
+            <div class="stats-grid" style="margin-bottom: 2rem;">
+                <div class="stat-card">
+                    <div class="stat-title">Total Policies</div>
+                    <div class="stat-value" th:text="${report.totalPolicies}">0</div>
+                    <small style="color: var(--text-muted);" th:text="${report.activePolicies + ' currently active'}">0 active</small>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-title">Premiums Collected</div>
+                    <div class="stat-value" style="font-size: 1.4rem; color: var(--accent);" th:text="${'LKR ' + #numbers.formatDecimal(report.totalPremiums, 1, 'COMMA', 0, 'POINT')}">LKR 0</div>
+                    <small style="color: var(--text-muted);">Total verified collections</small>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-title">Approved Claim Payouts</div>
+                    <div class="stat-value" style="font-size: 1.4rem; color: #f59e0b;" th:text="${'LKR ' + #numbers.formatDecimal(report.totalApprovedClaims, 1, 'COMMA', 0, 'POINT')}">LKR 0</div>
+                    <small style="color: var(--text-muted);" th:text="${report.approvedClaims + ' claims approved'}">0 claims</small>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-title">Loss Ratio (%)</div>
+                    <div class="stat-value" style="font-size: 1.6rem; color: var(--primary-accent);" th:text="${report.lossRatio + '%'}">0.0%</div>
+                    <small style="color: var(--text-muted);">Standard target: &lt; 65%</small>
+                </div>
+            </div>
+
+            <!-- Audit Findings Table -->
+            <h3 style="margin-bottom: 1rem;">2. Security & Regulatory Audit Trail Records</h3>
+            <div class="table-responsive" style="margin-bottom: 1.5rem;">
+                <table class="custom-table">
+                    <thead>
+                    <tr>
+                        <th>Timestamp</th>
+                        <th>Officer / User</th>
+                        <th>Role</th>
+                        <th>Action Type</th>
+                        <th>Module</th>
+                        <th>Audit Log Details</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="log : ${report.auditLogs}">
+                        <td style="font-size: 0.8rem; color: var(--text-muted);" th:text="${#temporals.format(log.timestamp, 'yyyy-MM-dd HH:mm:ss')}">Time</td>
+                        <td style="font-weight: 600;" th:text="${log.username}">User</td>
+                        <td>
+                            <span class="badge badge-secondary" th:text="${log.userRole}">ROLE</span>
+                        </td>
+                        <td style="font-weight: 600; color: var(--primary-accent);" th:text="${log.action}">ACTION</td>
+                        <td th:text="${log.targetModule}">Module</td>
+                        <td style="font-size: 0.85rem; color: var(--text-secondary);" th:text="${log.details}">Details</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Sign-off Block -->
+            <div style="display: flex; justify-content: space-between; margin-top: 3rem; padding-top: 2rem; border-top: 1px dashed var(--border);">
+                <div>
+                    <p style="margin: 0; font-weight: 600;">Prepared by:</p>
+                    <p style="margin: 0.25rem 0; color: var(--text-muted);">Compliance & Risk Officer</p>
+                    <p style="margin: 0; font-size: 0.8rem; color: var(--text-muted);">Risk & Compliance Division</p>
+                </div>
+                <div style="text-align: right;">
+                    <p style="margin: 0; font-weight: 600;">Approved by:</p>
+                    <p style="margin: 0.25rem 0; color: var(--text-muted);">Authorized Signatory</p>
+                    <p style="margin: 0; font-size: 0.8rem; color: var(--text-muted);">Branch Operations Manager</p>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+</body>
+</html>
