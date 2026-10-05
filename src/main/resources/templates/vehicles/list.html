@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Vehicle Enrollment - InsuraDrive</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="app-container">
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+    <main class="main-content">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+            <div>
+                <h2>Vehicle Enrollment</h2>
+                <p style="color: var(--text-secondary); font-size: 0.9rem;">
+                    Manage insured vehicle records, technical specifications, and roadworthiness inspections.
+                </p>
+            </div>
+            <div>
+                <a th:href="@{/vehicles/new}" class="btn btn-primary">Enroll New Vehicle</a>
+            </div>
+        </div>
+
+        <!-- Flash alerts -->
+        <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}">Vehicle action completed.</div>
+        <div th:if="${param.success}" class="alert alert-success" th:text="${param.success}">Vehicle action completed.</div>
+        <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}">An error occurred.</div>
+        <div th:if="${param.error}" class="alert alert-danger" th:text="${param.error}">An error occurred.</div>
+
+        <!-- Filter tabs -->
+        <div style="display: flex; gap: 0.5rem; margin-bottom: 1.5rem;">
+            <a th:href="@{/vehicles}" class="btn" th:classappend="${currentFilter == null ? 'btn-primary' : 'btn-secondary'}">All Vehicles</a>
+            <a th:href="@{/vehicles(filter='inspection')}" class="btn" th:classappend="${currentFilter == 'inspection' ? 'btn-primary' : 'btn-secondary'}">Pending Inspection</a>
+        </div>
+
+        <div class="glass-panel" style="padding: 1.5rem;">
+            <div class="table-responsive">
+                <table class="custom-table">
+                    <thead>
+                    <tr>
+                        <th>Registration No</th>
+                        <th>Owner Customer</th>
+                        <th>Make, Model & Year</th>
+                        <th>Category & Engine</th>
+                        <th>Estimated Value</th>
+                        <th>Inspection Status</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="v : ${vehicles}">
+                        <td>
+                            <strong style="color: var(--primary-accent); font-size: 1.05rem;" th:text="${v.registrationNo}">CAB-1234</strong><br>
+                            <small th:text="${'Chassis: ' + v.chassisNumber}" style="color: var(--text-muted); font-size: 0.75rem;">CH-12345</small>
+                        </td>
+                        <td>
+                            <strong th:text="${v.customer != null ? v.customer.fullName : 'Unassigned'}">Customer</strong><br>
+                            <small th:text="${v.customer != null ? v.customer.phone : ''}" style="color: var(--text-muted);">Phone</small>
+                        </td>
+                        <td>
+                            <span th:text="${v.makeModel}">Toyota Prius</span><br>
+                            <span class="badge badge-secondary" th:text="${'Mfg: ' + v.manufactureYear}">2020</span>
+                        </td>
+                        <td>
+                            <span th:text="${v.vehicleCategory}">Sedan</span><br>
+                            <small th:text="${v.engineCapacityCc + ' CC'}" style="color: var(--text-muted);">1800 CC</small>
+                        </td>
+                        <td>
+                            <strong style="color: var(--accent);" th:text="${'LKR ' + #numbers.formatDecimal(v.estimatedValue, 1, 'COMMA', 2, 'POINT')}">LKR 0.00</strong>
+                        </td>
+                        <td>
+                                    <span class="badge"
+                                          th:classappend="${v.inspectionStatus != null && v.inspectionStatus.name() == 'PASSED' ? 'badge-active' : (v.inspectionStatus != null && v.inspectionStatus.name() == 'PENDING_INSPECTION' ? 'badge-pending_payment' : 'badge-danger')}"
+                                          th:text="${v.inspectionStatus}">PASSED</span>
+
+                            <!-- Record Inspection Action -->
+                            <form th:action="@{/vehicles/inspect/{id}(id=${v.id})}" method="post" style="margin-top: 0.35rem; display: flex; gap: 0.25rem;">
+                                <select name="status" class="form-control" style="font-size: 0.75rem; padding: 0.15rem 0.3rem; width: 110px;">
+                                    <option value="PASSED" th:selected="${v.inspectionStatus != null && v.inspectionStatus.name() == 'PASSED'}">Pass</option>
+                                    <option value="PENDING_INSPECTION" th:selected="${v.inspectionStatus != null && v.inspectionStatus.name() == 'PENDING_INSPECTION'}">Pending</option>
+                                    <option value="FAILED" th:selected="${v.inspectionStatus != null && v.inspectionStatus.name() == 'FAILED'}">Fail</option>
+                                </select>
+                                <input type="hidden" name="notes" value="Verified by CRO during workshop inspection.">
+                                <button type="submit" class="btn btn-secondary" style="font-size: 0.75rem; padding: 0.2rem 0.4rem;">Set</button>
+                            </form>
+                        </td>
+                        <td>
+                            <div style="display: flex; gap: 0.5rem; align-items: center;">
+                                <a th:href="@{/vehicles/edit/{id}(id=${v.id})}" class="btn btn-secondary" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">Edit</a>
+                                <form th:action="@{/vehicles/delete/{id}(id=${v.id})}" method="post" onsubmit="return confirm('Are you sure you want to delete this vehicle?');">
+                                    <button type="submit" class="btn btn-danger" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">Delete</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</div>
+</body>
+</html>
