@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Branch Manager Dashboard - InsuraDrive</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+
+<body>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="app-container">
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+    <main class="main-content">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <div>
+                <h2>Branch Operations Executive Dashboard</h2>
+                <p style="color: var(--text-muted); font-size: 0.9rem;">Overview of total insurance portfolio
+                    performance, claims, and branch metrics.</p>
+            </div>
+            <div>
+                <a th:href="@{/policies/new}" class="btn btn-primary">Issue New Policy</a>
+            </div>
+        </div>
+
+        <!-- KPI Cards -->
+        <div class="kpi-grid">
+            <div class="glass-card kpi-card">
+                <div class="kpi-label">Registered Customers</div>
+                <div class="kpi-val" th:text="${totalCustomers}">0</div>
+            </div>
+
+            <div class="glass-card kpi-card">
+                <div class="kpi-label">Insured Vehicles</div>
+                <div class="kpi-val" th:text="${totalVehicles}">0</div>
+            </div>
+
+            <div class="glass-card kpi-card">
+                <div class="kpi-label">Active Policies</div>
+                <div class="kpi-val" th:text="${totalPolicies}">0</div>
+            </div>
+
+            <div class="glass-card kpi-card">
+                <div class="kpi-label">Total Claims Submitted</div>
+                <div class="kpi-val" th:text="${totalClaims}">0</div>
+            </div>
+        </div>
+
+        <!-- Active Policies & Pending Claims Grid -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1rem;">
+            <div class="glass-panel" style="padding: 1.5rem;">
+                <h3 style="margin-bottom: 1rem; font-size: 1.1rem;">Active Policies Overview</h3>
+                <div class="table-responsive">
+                    <table class="custom-table">
+                        <thead>
+                        <tr>
+                            <th>Policy No</th>
+                            <th>Customer</th>
+                            <th>Type</th>
+                            <th>Premium</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="p : ${recentPolicies}">
+                            <td th:text="${p.policyNumber}" style="font-weight: 600; color: var(--primary);">
+                                POL-000</td>
+                            <td th:text="${p.customer != null ? p.customer.fullName : 'N/A'}">Customer</td>
+                            <td th:text="${p.policyType}">COMPREHENSIVE</td>
+                            <td
+                                    th:text="${'LKR ' + #numbers.formatDecimal(p.annualPremium, 1, 'COMMA', 2, 'POINT')}">
+                                LKR 0.00</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="glass-panel" style="padding: 1.5rem;">
+                <h3 style="margin-bottom: 1rem; font-size: 1.1rem;">Claims Under Review</h3>
+                <div class="table-responsive">
+                    <table class="custom-table">
+                        <thead>
+                        <tr>
+                            <th>Claim No</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="c : ${recentClaims}">
+                            <td th:text="${c.claimNumber}" style="font-weight: 600;">CLM-000</td>
+                            <td
+                                    th:text="${'LKR ' + #numbers.formatDecimal(c.claimedAmount, 1, 'COMMA', 2, 'POINT')}">
+                                LKR 0.00</td>
+                            <td>
+                                        <span class="badge"
+                                              th:classappend="${'badge-' + #strings.toLowerCase(c.status)}"
+                                              th:text="${c.status}">SUBMITTED</span>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+</body>
+
+</html>

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Generate Compliance Report - InsuraDrive</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="app-container">
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+    <main class="main-content">
+        <div style="max-width: 720px; margin: 0 auto;">
+            <div class="glass-panel" style="padding: 2.2rem;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem;">
+                    <div>
+                        <h2 style="color: var(--text-primary); margin-bottom: 0.35rem;">Generate Compliance &amp; Audit Report</h2>
+                        <p style="color: var(--text-secondary); font-size: 0.88rem;">
+                            Regulatory Governance &amp; Compliance Reporting
+                        </p>
+                    </div>
+                    <span class="badge badge-active">Reports</span>
+                </div>
+
+                <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}">Error message</div>
+                <div th:if="${param.error}" class="alert alert-danger" th:text="${param.error}">Error message</div>
+
+                <form th:action="@{/reports/generate}" th:object="${reportFormDto}" method="post" novalidate>
+                    <div class="form-group">
+                        <label class="form-label">Operating Branch Scope *</label>
+                        <select th:field="*{branch}" class="form-control" th:errorclass="is-invalid" required>
+                            <option th:each="b : ${branches}" th:value="${b}" th:text="${b}"></option>
+                        </select>
+                        <span class="field-error" th:if="${#fields.hasErrors('branch')}" th:errors="*{branch}">Branch required</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Compliance Report Type *</label>
+                        <select th:field="*{reportType}" class="form-control" th:errorclass="is-invalid" required>
+                            <option th:each="rt : ${reportTypes}" th:value="${rt}" th:text="${rt}"></option>
+                        </select>
+                        <span class="field-error" th:if="${#fields.hasErrors('reportType')}" th:errors="*{reportType}">Report type required</span>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem;">
+                        <div class="form-group">
+                            <label class="form-label">Period Start Date *</label>
+                            <input type="date" th:field="*{startDate}" class="form-control" th:errorclass="is-invalid" required>
+                            <span class="field-error" th:if="${#fields.hasErrors('startDate')}" th:errors="*{startDate}">Start date required</span>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Period End Date *</label>
+                            <input type="date" th:field="*{endDate}" class="form-control" th:errorclass="is-invalid" required>
+                            <span class="field-error" th:if="${#fields.hasErrors('endDate')}" th:errors="*{endDate}">End date required</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Export Output Format *</label>
+                        <select th:field="*{format}" class="form-control" th:errorclass="is-invalid" required>
+                            <option value="PDF">Portable Document Format (PDF)</option>
+                            <option value="EXCEL">Microsoft Excel Spreadsheet (.xlsx)</option>
+                            <option value="CSV">Comma Separated Values (.csv)</option>
+                        </select>
+                        <span class="field-error" th:if="${#fields.hasErrors('format')}" th:errors="*{format}">Format required</span>
+                    </div>
+
+                    <div class="info-box">
+                        <strong>Compliance Notice:</strong> Generates official branch compliance and risk metrics for the selected operational scope and date range.
+                    </div>
+
+                    <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 2rem;">
+                        <a th:href="@{/reports}" class="btn btn-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-primary">Generate Report</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+</div>
+</body>
+</html>

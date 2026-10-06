@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>User Roles - InsuraDrive</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+
+<body>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="app-container">
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+    <main class="main-content">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <div>
+                <h2>User Accounts & Role-Based Access Control (RBAC)</h2>
+                <p style="color: var(--text-muted); font-size: 0.9rem;">Manage authorized system users across all 6
+                    stakeholder operational roles.</p>
+            </div>
+        </div>
+
+        <div class="glass-panel" style="padding: 1.5rem;">
+            <div class="table-responsive">
+                <table class="custom-table">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Username</th>
+                        <th>Full Name</th>
+                        <th>Email</th>
+                        <th>Assigned RBAC Role</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="u : ${users}">
+                        <td th:text="${u.id}">1</td>
+                        <td th:text="${u.username}" style="font-weight: 600; color: var(--primary);">Username
+                        </td>
+                        <td th:text="${u.fullName}">Full Name</td>
+                        <td th:text="${u.email}">Email</td>
+                        <td>
+                            <span class="badge badge-active" th:text="${u.role}">ROLE</span>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</div>
+</body>
+
+</html>
