@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Customer Dashboard - InsuraDrive</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="app-container">
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+    <main class="main-content">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <div>
+                <h2>Customer Self-Service Portal</h2>
+                <p style="color: var(--text-muted); font-size: 0.875rem; margin-top: 0.25rem;">Manage active insurance policies, submit claim requests, and download payment receipts.</p>
+            </div>
+            <div style="display: flex; gap: 1rem;">
+                <a th:href="@{/claims/new}" class="btn btn-primary">Submit New Claim</a>
+                <a th:href="@{/payments/new}" class="btn btn-success">Pay Premium</a>
+            </div>
+        </div>
+
+        <!-- Customer Policies Table -->
+        <div class="glass-panel" style="padding: 1.5rem; margin-bottom: 2rem;">
+            <h3 style="margin-bottom: 1rem; font-size: 1rem; color: var(--text-primary);">
+                Active Policies & Enrolled Vehicles
+            </h3>
+            <div class="table-responsive">
+                <table class="custom-table">
+                    <thead>
+                    <tr>
+                        <th>Policy Number</th>
+                        <th>Vehicle Reg</th>
+                        <th>Make & Model</th>
+                        <th>Coverage Type</th>
+                        <th>Sum Insured</th>
+                        <th>Annual Premium</th>
+                        <th>Status</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="p : ${myPolicies}">
+                        <td th:text="${p.policyNumber}" style="font-weight: 600; color: var(--primary-accent);">POL-000</td>
+                        <td th:text="${p.vehicle != null ? p.vehicle.registrationNo : 'N/A'}">REG-000</td>
+                        <td th:text="${p.vehicle != null ? p.vehicle.makeModel : 'N/A'}">Model</td>
+                        <td th:text="${p.policyType}">Type</td>
+                        <td th:text="${'LKR ' + #numbers.formatDecimal(p.sumInsured, 1, 'COMMA', 2, 'POINT')}">LKR 0.00</td>
+                        <td th:text="${'LKR ' + #numbers.formatDecimal(p.annualPremium, 1, 'COMMA', 2, 'POINT')}">LKR 0.00</td>
+                        <td>
+                            <span class="badge" th:classappend="${'badge-' + #strings.toLowerCase(p.status)}" th:text="${p.status}">ACTIVE</span>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- My Claims -->
+        <div class="glass-panel" style="padding: 1.5rem;">
+            <h3 style="margin-bottom: 1rem; font-size: 1rem; color: var(--text-primary);">
+                Insurance Claims History
+            </h3>
+            <div class="table-responsive">
+                <table class="custom-table">
+                    <thead>
+                    <tr>
+                        <th>Claim Number</th>
+                        <th>Incident Date</th>
+                        <th>Description</th>
+                        <th>Claimed Amount</th>
+                        <th>Status</th>
+                        <th>Assessor Remarks</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="c : ${myClaims}">
+                        <td th:text="${c.claimNumber}" style="font-weight: 600;">CLM-000</td>
+                        <td th:text="${c.incidentDate}">2026-01-01</td>
+                        <td th:text="${c.description}">Description</td>
+                        <td th:text="${'LKR ' + #numbers.formatDecimal(c.claimedAmount, 1, 'COMMA', 2, 'POINT')}">LKR 0.00</td>
+                        <td>
+                            <span class="badge" th:classappend="${'badge-' + #strings.toLowerCase(c.status)}" th:text="${c.status}">SUBMITTED</span>
+                        </td>
+                        <td th:text="${c.officerRemarks != null ? c.officerRemarks : 'Awaiting review'}">Remarks</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</div>
+</body>
+</html>
