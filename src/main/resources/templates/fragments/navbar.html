@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<header th:fragment="navbar" class="navbar">
+  <a th:href="@{/dashboard}" class="brand">
+    <div class="brand-logo">ID</div>
+    <span>InsuraDrive</span>
+  </a>
+
+  <div class="topbar-right">
+    <!-- Customer badge (if customer) -->
+    <div th:if="${activeRole == 'CUSTOMER'}" style="display: flex; align-items: center; gap: 0.75rem; margin-right: 0.5rem;">
+      <span class="badge badge-active" style="padding: 0.35rem 0.75rem; font-size: 0.72rem;">Customer Account</span>
+      <span th:text="${session.displayName != null ? session.displayName : (session.currentUser != null ? session.currentUser : 'Customer')}" style="font-weight: 700; font-size: 0.85rem; color: var(--text-2);">Kamal Perera</span>
+    </div>
+
+    <!-- Role Switcher Form (Staff only) -->
+    <form th:if="${activeRole != 'CUSTOMER'}" th:action="@{/switch-role}" method="post" class="role-switcher-container">
+      <span class="role-label">View as</span>
+      <select name="role" class="role-select" onchange="this.form.submit()" aria-label="Switch active role">
+        <option value="BRANCH_MANAGER" th:selected="${activeRole == 'BRANCH_MANAGER'}">Branch Operations Manager</option>
+        <option value="CUSTOMER_RELATIONS_OFFICER" th:selected="${activeRole == 'CUSTOMER_RELATIONS_OFFICER'}">Customer Relations Officer (CRO)</option>
+        <option value="CLAIMS_EXECUTIVE" th:selected="${activeRole == 'CLAIMS_EXECUTIVE'}">Claims Executive</option>
+        <option value="FINANCE_SUPERVISOR" th:selected="${activeRole == 'FINANCE_SUPERVISOR'}">Finance &amp; Payments Supervisor</option>
+        <option value="RISK_COMPLIANCE_OFFICER" th:selected="${activeRole == 'RISK_COMPLIANCE_OFFICER'}">Risk &amp; Compliance Officer</option>
+      </select>
+    </form>
+
+    <a th:href="@{/logout}" class="btn btn-secondary">Log out</a>
+  </div>
+</header>
+</body>
+</html>
